@@ -13,11 +13,13 @@ ton,upright("t"),true
 newton,upright("N"),true
 pascal,upright("Pa"),true
 joule,upright("J"),true
+erg,upright("erg"),true
 watt,upright("W"),true
 ampere,upright("A"),true
 volt,upright("V"),true
 ohm,upright("Ω"),true
 tesla,upright("T"),true
+gauss,upright("G"),true
 henry,upright("H"),true
 farad,upright("F"),true
 kelvin,upright("K"),true
