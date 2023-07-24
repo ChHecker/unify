@@ -115,8 +115,6 @@
   let per = false
   // whether waiting for a postfix
   let post = false
-  // whether a unit is finished
-  let unit-finished = false
   // one unit
   let unit = ""
 
@@ -134,30 +132,27 @@
           unit += "^("
         }
         unit += postfixes.at(u)
-        unit += ") \" \""
+        unit += ")"
         per = false
         post = false
 
         formatted += unit
         unit = ""
-        unit-finished = false
         continue
       // add per
       } else if per {
-        unit += "^(-1) \" \""
+        unit += "^(-1)"
         per = false
         post = false
 
         formatted += unit
         unit = ""
-        unit-finished = false
       // finish unit
       } else {
         post = false
 
         formatted += unit
         unit = ""
-        unit-finished = false
       }
     }
 
