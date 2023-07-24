@@ -33,3 +33,4 @@ mole,upright("mol"),true
 becquerel,upright("Bq"),true
 gray,upright("Gy"),true
 sievert,upright("Sv"),true
+percent,percent,true
