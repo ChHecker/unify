@@ -1,4 +1,4 @@
-#let re-num = regex("^(-?\d+\.?\d*)(((\+(\d+\.?\d*)-(\d+\.?\d*)))|((((\+-)|(-\+))(\d+\.?\d*))))?(e(-?\d+))?$")
+#let re-num = regex("^(-?\d+\.?\d*)?(((\+(\d+\.?\d*)-(\d+\.?\d*)))|((((\+-)|(-\+))(\d+\.?\d*))))?(e(-?\d+))?$")
 
 #let _format-num(value, exponent: none, upper: none, lower: none) = {
   /// Format a number.
@@ -8,7 +8,9 @@
   /// - `lower`: Lower uncertainty.
 
   let formatted-value = ""
-  formatted-value += str(value)
+  if value != none {
+    formatted-value += str(value)
+  }
   if upper != none and lower != none {
     if upper != lower {
       formatted-value += "^(+" + str(upper) + ")"
@@ -26,7 +28,10 @@
     formatted-value += "))"
   }
   if exponent != none {
-    formatted-value += " dot 10^(" + str(exponent) + ")"
+    if value != none {
+      formatted-value += " dot "
+    }
+    formatted-value += "10^(" + str(exponent) + ")"
   }
   formatted-value
 }
@@ -229,11 +234,17 @@
 
   formatted-value += lower
   if exponent-lower != exponent-upper and exponent-lower != none {
-    formatted-value += "dot 10^(" + str(exponent-lower) + ")"
+    if lower != none {
+      formatted-value += "dot "
+    }
+    formatted-value += "10^(" + str(exponent-lower) + ")"
   }
   formatted-value += space + delimiter + space + upper
   if exponent-lower != exponent-upper and exponent-upper != none {
-    formatted-value += "dot 10^(" + str(exponent-upper) + ")"
+    if upper != none {
+      formatted-value += "dot "
+    }
+    formatted-value += "10^(" + str(exponent-upper) + ")"
   }
   if exponent-lower == exponent-upper and (exponent-lower != none and exponent-upper != none) {
     formatted-value = "lr((" + formatted-value
