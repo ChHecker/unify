@@ -205,7 +205,7 @@
 
   let formatted-unit = ""
   if raw-unit {
-    formatted-unit = space + unit-string
+    formatted-unit = space + unit
   } else {
     formatted-unit = _format-unit(unit, space: space)
   }
@@ -269,7 +269,7 @@
   eval(formatted)
 }
 
-#let unit-range(
+#let unitrange(
   lower, upper, unit, raw-unit: false, delimiter: "-",
   space: "", unit-space: "#h(0.16667em)"
 ) = {
@@ -303,7 +303,7 @@
 
   let formatted-unit = ""
   if raw-unit {
-    formatted-unit = space + unit-string
+    formatted-unit = space + unit
   } else {
     formatted-unit = _format-unit(unit, space: unit-space)
   }
