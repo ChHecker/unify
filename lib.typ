@@ -1,4 +1,6 @@
-#let re-num = regex("^(-?\d+\.?\d*)?(((\+(\d+\.?\d*)-(\d+\.?\d*)))|((((\+-)|(-\+))(\d+\.?\d*))))?(e(-?\d+))?$")
+// #let re-num = regex("^(-?\d+\.?\d*)?(((\+(\d+\.?\d*)-(\d+\.?\d*)))|((((\+-)|(-\+))(\d+\.?\d*))))?(e(-?\d+))?$")
+#let re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e(-?\d+))?$")
+
 
 #let _format-num(value, exponent: none, upper: none, lower: none) = {
   /// Format a number.
@@ -9,19 +11,19 @@
 
   let formatted-value = ""
   if value != none {
-    formatted-value += str(value)
+    formatted-value += str(value).replace(",", ",#h(0pt)")
   }
   if upper != none and lower != none {
     if upper != lower {
       formatted-value += "^(+" + str(upper) + ")"
       formatted-value += "_(-" + str(lower) + ")"
     } else {
-      formatted-value += " plus.minus " + str(upper)
+      formatted-value += " plus.minus " + str(upper).replace(",", ",#h(0pt)")
     }
   } else if upper != none {
-    formatted-value += " plus.minus " + str(upper)
+    formatted-value += " plus.minus " + str(upper).replace(",", ",#h(0pt)")
   } else if lower != none {
-    formatted-value += " plus.minus " + str(lower)
+    formatted-value += " plus.minus " + str(lower).replace(",", ",#h(0pt)")
   }
   if not (upper == none and lower == none) {
     formatted-value = "lr((" + formatted-value
@@ -40,24 +42,24 @@
   /// Format a number.
   /// - `value`: String with the number.
 
-  value = str(value).replace(" ", "")
+  value = str(value).replace(" ", "")//.replace(",", ".")
   let match-value = value.match(re-num)
   assert.ne(match-value, none, message: "invalid string")
   let captures-value = match-value.captures
 
   let upper = none
   let lower = none
-  if captures-value.at(11) != none {
-    upper = captures-value.at(11)
+  if captures-value.at(14) != none {
+    upper = captures-value.at(14)
     lower = none
   } else {
-    upper = captures-value.at(4)
-    lower = captures-value.at(5)
+    upper = captures-value.at(5)
+    lower = captures-value.at(7)
   }
 
   let formatted = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(13),
+    exponent: captures-value.at(17),
     upper: upper,
     lower: lower
   )
@@ -182,23 +184,23 @@
   /// - `space`: Space between units.
 
   value = str(value).replace(" ", "")
-  let match-num = value.match(re-num)
-  assert.ne(match-num, none, message: "invalid string")
-  let captures-num = match-num.captures
+  let match-value = value.match(re-num)
+  assert.ne(match-value, none, message: "invalid string")
+  let captures-value = match-value.captures
 
   let upper = none
   let lower = none
-  if captures-num.at(11) != none {
-    upper = captures-num.at(11)
+  if captures-value.at(14) != none {
+    upper = captures-value.at(14)
     lower = none
   } else {
-    upper = captures-num.at(4)
-    lower = captures-num.at(5)
+    upper = captures-value.at(5)
+    lower = captures-value.at(7)
   }
 
   let formatted-value = _format-num(
-    captures-num.at(0),
-    exponent: captures-num.at(13),
+    captures-value.at(0),
+    exponent: captures-value.at(17),
     upper: upper,
     lower: lower
   )
@@ -227,14 +229,14 @@
 
   let formatted-value = ""
 
-  formatted-value += lower
+  formatted-value += lower.replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-lower != none {
     if lower != none {
       formatted-value += "dot "
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + delimiter + space + upper
+  formatted-value += space + delimiter + space + upper.replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
       formatted-value += "dot "
@@ -265,8 +267,8 @@
   let formatted = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(13),
-    exponent-upper: captures-upper.at(13),
+    exponent-lower: captures-lower.at(17),
+    exponent-upper: captures-upper.at(17),
     delimiter: delimiter,
     space: space,
   )
@@ -300,8 +302,8 @@
   let formatted-value = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(13),
-    exponent-upper: captures-upper.at(13),
+    exponent-lower: captures-lower.at(17),
+    exponent-upper: captures-upper.at(17),
     delimiter: delimiter,
     space: space,
     force-parentheses: true
