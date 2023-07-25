@@ -75,7 +75,7 @@
   let dict = (:)
 
   for line in array {
-    dict.insert(line.at(0), line.at(1))
+    dict.insert(lower(line.at(0)), line.at(1))
   }
   dict
 }
@@ -92,9 +92,9 @@
   for line in array {
     units.insert(line.at(0), line.at(1))
     if line.at(2) == "false" or line.at(2) == "0" {
-      units-space.insert(line.at(0), false)
+      units-space.insert(lower(line.at(0)), false)
     } else {
-      units-space.insert(line.at(0), true)
+      units-space.insert(lower(line.at(0)), true)
     }
   }
   (units, units-space)
@@ -118,7 +118,7 @@
   // one unit
   let unit = ""
 
-  let split = string.split(" ")
+  let split = lower(string).split(" ")
   split.push("")
 
   for u in split {
