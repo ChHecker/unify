@@ -88,7 +88,7 @@
 
   value = str(value).replace(" ", "")//.replace(",", ".")
   let match-value = value.match(re-num)
-  assert.ne(match-value, none, message: "invalid string")
+  assert.ne(match-value, none, message: "invalid number: " + value)
   let captures-value = match-value.captures
 
   let upper = none
@@ -216,6 +216,8 @@
         unit = space + unit
       }
       post = true
+    } else if u != "" {
+      panic("invalid unit: " + u)
     }
   }
   formatted
@@ -243,7 +245,7 @@
 
   value = str(value).replace(" ", "")
   let match-value = value.match(re-num)
-  assert.ne(match-value, none, message: "invalid string")
+  assert.ne(match-value, none, message: "invalid number: " + value)
   let captures-value = match-value.captures
 
   let upper = none
@@ -321,12 +323,12 @@
   /// - `thousandsep`: The seperator between the thousands of the float.
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
-  assert.ne(match-lower, none, message: "invalid string")
+  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
   let captures-lower = match-lower.captures
 
   upper = str(upper).replace(" ", "")
   let match-upper = upper.match(re-num)
-  assert.ne(match-upper, none, message: "invalid string")
+  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
 
   let formatted = _format-range(
@@ -358,12 +360,12 @@
 
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
-  assert.ne(match-lower, none, message: "invalid string")
+  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
   let captures-lower = match-lower.captures
 
   upper = str(upper).replace(" ", "")
   let match-upper = upper.match(re-num)
-  assert.ne(match-upper, none, message: "invalid string")
+  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
 
   let formatted-value = _format-range(
