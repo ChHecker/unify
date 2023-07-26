@@ -8,27 +8,26 @@
 #import "@preview/unify:0.0.1": num,unit,range,unit-range
 
 $ #num("-1.3+-0.5e-6") $
-$ #unit("1.3+1.2-0.3e3", "meter per second squared") $
-$ #range("1e-2", "3e5") $
-$ #unit-range("1e3", "2e3", "meter per second") $
+$ #qty("1.3+1.2-0.3e3", "meter per second squared") $
+$ #numrange("1e-2", "3e5") $
+$ #qtyrange("1e3", "2e3", "meter per second") $
 ```
 <img src="examples/overview.jpg" width="200">
 
 
 ## `num`
-`num` uses string parsing in order to typeset numbers. They can have the following form:
-- `-`
+`num` uses string parsing in order to typeset numbers, including separators between the thousands. They can have the following form:
 - `float` or `integer` number
 - either (`{}` stands for a number)
     - symmetric uncertainties with `+-{}`
     - asymmetric uncertainties with `+{}-{}`
 - exponential notation `e{}`
 
-Parentheses are automatically set as necessary.
+Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands.
 
 
 ## `unit`
-`unit` allows a `num` as the first argument following the same rules. The second argument is the `unit`. If `raw_unit` is set to true, its value will be passed on to the result. Otherwise, the unit should be written in words. Later on, I made a shorthand notation. The value of `space` will be inserted between units if necessary.  
+`unit` takes the unit in words as its first argument. Later on, I will make a shorthand notation. The value of `space` will be inserted between units if necessary.  
 Units have four possible parts:
 - `per` forms the inverse of the following unit.
 - A prefix in the sense of SI. This is added before the unit.
@@ -51,9 +50,13 @@ The first column specifies the whole word that will be replaced. This should be 
 If you think there are units not included that are of interest for other users, you can create an issue or PR.
 
 
-## `range`
-`range` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`.
+## `qty`
+`qty` allows a `num` as the first argument following the same rules. The second argument is a unit. If `rawunit` is set to true, its value will be passed on to the result (mind that the string passed on will be passed to `eval`, so add escaped quotes `\"` if necessary). Otherwise, it follows the rules of `unit`. The value of `space` will be inserted between units if necessary, and `thousandsep` between the thousands.  
 
 
-## `unit_range`
-`unit_range` is just a combination of `unit` and `range`.
+## `numrange`
+`numrange` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`.
+
+
+## `qtyrange`
+`qtyrange` is just a combination of `unit` and `range`.

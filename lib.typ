@@ -1,8 +1,12 @@
 // #let re-num = regex("^(-?\d+\.?\d*)?(((\+(\d+\.?\d*)-(\d+\.?\d*)))|((((\+-)|(-\+))(\d+\.?\d*))))?(e(-?\d+))?$")
-#let re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e(-?\d+))?$")
+#let re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e([-\+]?\d+))?$")
 
 
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
+  /// Formats a float with thousands separator.
+  /// - `f`: Float to format.
+  /// - `decsep`: Which decimal separator to use. This must be the same as the one used in `f`. Set it to `auto` to automatically choose it. Falls back to `.`.
+  /// - `thousandsep`: The seperator between the thousands.
   let string = ""
   if decsep == "auto" {
     if "," in f {
@@ -46,6 +50,7 @@
   /// - `exponent`: Exponent in the exponential notation.
   /// - `upper`: Upper uncertainty.
   /// - `lower`: Lower uncertainty.
+  /// - `thousandsep`: The seperator between the thousands of the float.
 
   let formatted-value = ""
   if value != none {
@@ -76,9 +81,10 @@
   formatted-value
 }
 
-#let num(value) = {
+#let num(value, thousandsep: "#h(0.166667em)") = {
   /// Format a number.
   /// - `value`: String with the number.
+  /// - `thousandsep`: The seperator between the thousands of the float.
 
   value = str(value).replace(" ", "")//.replace(",", ".")
   let match-value = value.match(re-num)
@@ -99,7 +105,8 @@
     captures-value.at(0),
     exponent: captures-value.at(17),
     upper: upper,
-    lower: lower
+    lower: lower,
+    thousandsep: thousandsep
   )
 
   formatted = "$" + formatted + "$"
@@ -226,12 +233,13 @@
   eval(formatted)
 }
 
-#let qty(value, unit, rawunit: false, space: "#h(0.166667em)") = {
+#let qty(value, unit, rawunit: false, space: "#h(0.166667em)", thousandsep: "#h(0.166667em)") = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `space`: Space between units.
+  /// - `thousandsep`: The seperator between the thousands of the float.
 
   value = str(value).replace(" ", "")
   let match-value = value.match(re-num)
@@ -252,7 +260,8 @@
     captures-value.at(0),
     exponent: captures-value.at(17),
     upper: upper,
-    lower: lower
+    lower: lower,
+    thousandsep: thousandsep
   )
 
   let formatted-unit = ""
@@ -268,13 +277,14 @@
 
 #let _format-range(
   lower, upper, exponent-lower: none, exponent-upper: none,
-  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)" , force-parentheses: false
+  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)", force-parentheses: false
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `(exponent-lower, exponent-upper)`: Strings containing the exponentials in exponential notation.
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
+  /// - `thousandsep`: The seperator between the thousands of the float.
   /// - `force-parentheses`: Whether to force parentheses around the range.
 
   let formatted-value = ""
@@ -304,6 +314,11 @@
 }
 
 #let numrange(lower, upper, delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)") = {
+  /// Format a range.
+  /// - `(lower, upper)`: Strings containing the numbers.
+  /// - `delimiter`: Symbol between the numbers.
+  /// - `space`: Space between the numbers and the delimiter.
+  /// - `thousandsep`: The seperator between the thousands of the float.
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid string")
@@ -339,6 +354,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `unitspace`: Space between units.
+  /// - `thousandsep`: The seperator between the thousands of the float.
 
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
