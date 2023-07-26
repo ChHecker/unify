@@ -7,12 +7,12 @@
 ```ts
 #import "@preview/unify:0.0.2": num,unit,range,unit-range
 
-$ #num("-1.3+-0.5e-6") $
+$ #num("-1.32865+-0.50273e-6") $
 $ #qty("1.3+1.2-0.3e3", "meter per second squared") $
 $ #numrange("1e-2", "3e5") $
 $ #qtyrange("1e3", "2e3", "meter per second") $
 ```
-<img src="examples/overview.jpg" width="200">
+<img src="examples/overview.jpg" width="300">
 
 
 ## `num`
