@@ -2,7 +2,45 @@
 #let re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e(-?\d+))?$")
 
 
-#let _format-num(value, exponent: none, upper: none, lower: none) = {
+#let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
+  let string = ""
+  if decsep == "auto" {
+    if "," in f {
+      decsep = ","
+    } else{
+      decsep = "."
+    }
+  }
+
+  let split = str(f).split(decsep)
+  let int-part = split.at(0)
+  let dec-part = split.at(1, default: none)
+  let int-list = int-part.clusters()
+
+  for (i, n) in int-list.enumerate() {
+    let mod = (i - int-list.len()) / 3
+    if int(mod) == mod {
+      string += " " + thousandsep + " "
+    }
+    string += str(n)
+  }
+
+  if dec-part != none {
+    let dec-list = dec-part.clusters()
+    string += decsep
+    for (i, n) in dec-list.enumerate() {
+      let mod = i / 3
+      if int(mod) == mod and i != 0 {
+        string += " " + thousandsep + " "
+      }
+      string += str(n)
+    }
+  }
+
+  string
+}
+
+#let _format-num(value, exponent: none, upper: none, lower: none, thousandsep: "#h(0.166667em)") = {
   /// Format a number.
   /// - `value`: Value of the number.
   /// - `exponent`: Exponent in the exponential notation.
@@ -11,19 +49,19 @@
 
   let formatted-value = ""
   if value != none {
-    formatted-value += str(value).replace(",", ",#h(0pt)")
+    formatted-value += _format-float(value, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   }
   if upper != none and lower != none {
     if upper != lower {
-      formatted-value += "^(+" + str(upper) + ")"
-      formatted-value += "_(-" + str(lower) + ")"
+      formatted-value += "^(+" + _format-float(upper, thousandsep: thousandsep) + ")"
+      formatted-value += "_(-" + _format-float(lower, thousandsep: thousandsep) + ")"
     } else {
-      formatted-value += " plus.minus " + str(upper).replace(",", ",#h(0pt)")
+      formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
     }
   } else if upper != none {
-    formatted-value += " plus.minus " + str(upper).replace(",", ",#h(0pt)")
+    formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   } else if lower != none {
-    formatted-value += " plus.minus " + str(lower).replace(",", ",#h(0pt)")
+    formatted-value += " plus.minus " + _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   }
   if not (upper == none and lower == none) {
     formatted-value = "lr((" + formatted-value
@@ -176,8 +214,20 @@
   formatted
 }
 
-#let unit(value, unit, rawunit: false, space: "#h(0.166667em)") = {
+#let unit(unit, space: "#h(0.166667em)") = {
   /// Format a unit.
+  /// - `unit`: String containing the unit.
+  /// - `space`: Space between units.
+
+  let formatted-unit = ""
+  formatted-unit = _format-unit(unit, space: space)
+
+  let formatted = "$" + formatted-unit + "$"
+  eval(formatted)
+}
+
+#let qty(value, unit, rawunit: false, space: "#h(0.166667em)") = {
+  /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
@@ -218,7 +268,7 @@
 
 #let _format-range(
   lower, upper, exponent-lower: none, exponent-upper: none,
-  delimiter: "-", space: "#h(0.16667em)", force-parentheses: false
+  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)" , force-parentheses: false
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -229,14 +279,14 @@
 
   let formatted-value = ""
 
-  formatted-value += lower.replace(",", ",#h(0pt)")
+  formatted-value += _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-lower != none {
     if lower != none {
       formatted-value += "dot "
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + delimiter + space + upper.replace(",", ",#h(0pt)")
+  formatted-value += space + delimiter + space + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
       formatted-value += "dot "
@@ -253,7 +303,7 @@
   formatted-value
 }
 
-#let range(lower, upper, delimiter: "-", space: "#h(0.16667em)") = {
+#let numrange(lower, upper, delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)") = {
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid string")
@@ -270,6 +320,7 @@
     exponent-lower: captures-lower.at(17),
     exponent-upper: captures-upper.at(17),
     delimiter: delimiter,
+    thousandsep: thousandsep,
     space: space,
   )
   formatted = "$" + formatted + "$"
@@ -277,9 +328,9 @@
   eval(formatted)
 }
 
-#let unitrange(
-  lower, upper, unit, rawunit: false, delimiter: "-",
-  space: "", unitspace: "#h(0.16667em)"
+#let qtyrange(
+  lower, upper, unit, rawunit: false, delimiter: "-", space: "",
+  unitspace: "#h(0.16667em)", thousandsep: "#h(0.166667em)"
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -306,6 +357,7 @@
     exponent-upper: captures-upper.at(17),
     delimiter: delimiter,
     space: space,
+    thousandsep: thousandsep,
     force-parentheses: true
   )
 
