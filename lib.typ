@@ -176,11 +176,11 @@
   formatted
 }
 
-#let unit(value, unit, raw-unit: false, space: "#h(0.166667em)") = {
+#let unit(value, unit, rawunit: false, space: "#h(0.166667em)") = {
   /// Format a unit.
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
-  /// - `raw-unit`: Whether to transform the unit or keep the raw string.
+  /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `space`: Space between units.
 
   value = str(value).replace(" ", "")
@@ -206,7 +206,7 @@
   )
 
   let formatted-unit = ""
-  if raw-unit {
+  if rawunit {
     formatted-unit = space + unit
   } else {
     formatted-unit = _format-unit(unit, space: space)
@@ -278,16 +278,16 @@
 }
 
 #let unitrange(
-  lower, upper, unit, raw-unit: false, delimiter: "-",
-  space: "", unit-space: "#h(0.16667em)"
+  lower, upper, unit, rawunit: false, delimiter: "-",
+  space: "", unitspace: "#h(0.16667em)"
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `unit`: String containing the unit.
-  /// - `raw-unit`: Whether to transform the unit or keep the raw string.
+  /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
-  /// - `unit-space`: Space between units.
+  /// - `unitspace`: Space between units.
 
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
@@ -310,10 +310,10 @@
   )
 
   let formatted-unit = ""
-  if raw-unit {
+  if rawunit {
     formatted-unit = space + unit
   } else {
-    formatted-unit = _format-unit(unit, space: unit-space)
+    formatted-unit = _format-unit(unit, space: unitspace)
   }
 
   let formatted = "$" + formatted-value + formatted-unit + "$"
