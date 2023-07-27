@@ -174,6 +174,9 @@
 #let chunk(string, per) = (string: string, per: per)
 
 #let _format-unit-short(string, space: "#h(0.166667em)") = {
+  /// Format a unit using the shorthand notation.
+  /// - `string`: String containing the unit.
+  /// - `space`: Space between units.
 
   let formatted = ""
 
@@ -237,7 +240,7 @@
 }
 
 #let _format-unit(string, space: "#h(0.166667em)") = {
-  /// Format a unit.
+  /// Format a unit using written-out words.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
 
