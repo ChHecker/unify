@@ -231,7 +231,6 @@
     } else if per {
       formatted += "^(-1)"
     }
-    formatted += space
   }
 
   formatted
