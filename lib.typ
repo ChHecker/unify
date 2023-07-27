@@ -113,7 +113,23 @@
   eval(formatted)
 }
 
-#let _fix-csv(path, delimiter: ",") = {
+#let _prefix-csv(path, delimiter: ",") = {
+  /// Load a CSV file with pre- or postfixes.
+  /// - `path`: Path of the CSV file.
+  /// - `delimiter`: Passed to the `csv` function.
+
+  let array = csv(path, delimiter: delimiter)
+  let symbols = (:)
+  let symbols-short = (:)
+
+  for line in array {
+    symbols.insert(lower(line.at(0)), line.at(2))
+    symbols-short.insert(line.at(1), line.at(2))
+  }
+  (symbols, symbols-short)
+}
+
+#let _postfix-csv(path, delimiter: ",") = {
   /// Load a CSV file with pre- or postfixes.
   /// - `path`: Path of the CSV file.
   /// - `delimiter`: Passed to the `csv` function.
@@ -134,22 +150,93 @@
 
   let array = csv(path, delimiter: delimiter)
   let units = (:)
+  let units-short = (:)
   let units-space = (:)
+  let units-short-space = (:)
 
   for line in array {
-    units.insert(line.at(0), line.at(1))
-    if line.at(2) == "false" or line.at(2) == "0" {
+    units.insert(line.at(0), line.at(2))
+    units-short.insert(line.at(1), line.at(2))
+    if line.at(3) == "false" or line.at(3) == "0" {
       units-space.insert(lower(line.at(0)), false)
+      units-short-space.insert(lower(line.at(1)), false)
     } else {
       units-space.insert(lower(line.at(0)), true)
+      units-short-space.insert(lower(line.at(1)), true)
     }
   }
-  (units, units-space)
+  (units, units-short, units-space, units-short-space)
 }
 
-#let prefixes = _fix-csv("prefixes.csv")
-#let (units, units-space) = _unit-csv("units.csv")
-#let postfixes = _fix-csv("postfixes.csv")
+#let (prefixes, prefixes-short) = _prefix-csv("prefixes.csv")
+#let (units, units-short, units-space, units-short-space) = _unit-csv("units.csv")
+#let postfixes = _postfix-csv("postfixes.csv")
+
+#let chunk(string, per) = (string: string, per: per)
+
+#let _format-unit-short(string, space: "#h(0.166667em)") = {
+
+  let formatted = ""
+
+  let split = string
+    .replace(regex(" */ *"), "/")
+    .replace(regex(" +"), " ")
+    .split(regex(" "))
+  let chunks = ()
+  for s in split {
+    let per-split = s.split("/")
+    chunks.push(chunk(per-split.at(0), false))
+    if per-split.len() > 1 {
+      for p in per-split.slice(1) {
+        chunks.push(chunk(p, true))
+      }
+    }
+  }
+
+  let prefixes = ()
+  for (string: string, per: per) in chunks {
+    let acc = ""
+    let u-space = true
+    let prefix = none
+    let unit = ""
+    let exponent = none
+
+    let qty-exp = string.split("^")
+    let quantity = qty-exp.at(0)
+    exponent = qty-exp.at(1, default: none)
+
+    for char in quantity.clusters() {
+      acc += char
+      if acc in prefixes-short and prefix == none {
+        prefix = prefixes-short.at(acc)
+        acc = ""
+      } else if acc in units-short {
+        unit = units-short.at(acc)
+        u-space = units-short-space.at(acc)
+        acc = ""
+      } else if acc.len() == quantity.len() {
+        panic("invalid unit: " + quantity)
+      }
+    }
+
+    if u-space {
+      formatted += space
+    }
+    formatted += prefix + unit
+    if exponent != none {
+      if per {
+        formatted += "^(-" + exponent + ")"
+      } else {
+        formatted += "^(" + exponent + ")"
+      }
+    } else if per {
+      formatted += "^(-1)"
+    }
+    formatted += space
+  }
+
+  formatted
+}
 
 #let _format-unit(string, space: "#h(0.166667em)") = {
   /// Format a unit.
@@ -217,7 +304,7 @@
       }
       post = true
     } else if u != "" {
-      panic("invalid unit: " + u)
+      return _format-unit-short(string, space: space)
     }
   }
   formatted
