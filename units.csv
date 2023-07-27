@@ -2,7 +2,11 @@ meter,m,upright("m"),true
 metre,m,upright("m"),true
 lightyear,ly,upright("ly"),true
 parsec,pc,upright("pc"),true
+astronomicalunit,au,upright("au"),true
 angstrom,A,upright("Å"),true
+hectar,ha,upright("ha"),true
+litre,l,upright("l"),true
+liter,L,upright("L"),true
 second,s,upright("s"),true
 minute,min,upright("min"),true
 day,d,upright("d"),true
@@ -11,10 +15,12 @@ year,yr,upright("a"),true
 hertz,Hz,upright("Hz"),true
 gram,g,upright("g"),true
 ton,t,upright("t"),true
+tonne,t,upright("t"),true
 newton,N,upright("N"),true
 pascal,Pa,upright("Pa"),true
 joule,J,upright("J"),true
 erg,erg,upright("erg"),true
+electronvolt,eV,upright("eV"),true
 watt,W,upright("W"),true
 ampere,A,upright("A"),true
 volt,V,upright("V"),true
@@ -37,3 +43,5 @@ becquerel,Bq,upright("Bq"),true
 gray,Gy,upright("Gy"),true
 sievert,Sv,upright("Sv"),true
 percent,%,percent,true
+decibel,dB,upright("dB"),true
+neper,Np,upright("Np"),true
