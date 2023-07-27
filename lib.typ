@@ -515,7 +515,7 @@
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + delimiter + space + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+  formatted-value += space + " " + delimiter + " " + space + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
       formatted-value += "dot "
