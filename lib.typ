@@ -158,14 +158,14 @@
   let units-short-space = (:)
 
   for line in array {
-    units.insert(line.at(0), line.at(2))
+    units.insert(lower(line.at(0)), line.at(2))
     units-short.insert(line.at(1), line.at(2))
     if line.at(3) == "false" or line.at(3) == "0" {
       units-space.insert(lower(line.at(0)), false)
-      units-short-space.insert(lower(line.at(1)), false)
+      units-short-space.insert(line.at(1), false)
     } else {
       units-space.insert(lower(line.at(0)), true)
-      units-short-space.insert(lower(line.at(1)), true)
+      units-short-space.insert(line.at(1), true)
     }
   }
   (units, units-short, units-space, units-short-space)
