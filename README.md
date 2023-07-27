@@ -8,9 +8,9 @@
 #import "@preview/unify:0.3.0": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
-$ qty("1.3+1.2-0.3e3", "erg/cm^2/s") $
-$ numrange("1e-2", "3e5") $
-$ qtyrange("1e3", "2e3", "meter per second squared") $
+$ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
+$ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
+$ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
 ```
 <img src="examples/overview.jpg" width="300">
 
@@ -27,7 +27,7 @@ Parentheses are automatically set as necessary. Use `thousandsep` to change the 
 
 
 ## `unit`
-`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary.  
+`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), and `fraction` or `/` using fraction.  
 Units in words have four possible parts:
 - `per` forms the inverse of the following unit.
 - A written-out prefix in the sense of SI (e.g. `centi`). This is added before the unit.
@@ -59,7 +59,7 @@ If you think there are units not included that are of interest for other users, 
 
 
 ## `qty`
-`qty` allows a `num` as the first argument following the same rules. The second argument is a unit. If `rawunit` is set to true, its value will be passed on to the result (note that the string passed on will be passed to `eval`, so add escaped quotes `\"` if necessary). Otherwise, it follows the rules of `unit`. The value of `space` will be inserted between units if necessary, and `thousandsep` between the thousands.  
+`qty` allows a `num` as the first argument following the same rules. The second argument is a unit. If `rawunit` is set to true, its value will be passed on to the result (note that the string passed on will be passed to `eval`, so add escaped quotes `\"` if necessary). Otherwise, it follows the rules of `unit`. The value of `space` will be inserted between units if necessary, `thousandsep` between the thousands, and `per` switches between exponents and fractions.  
 
 
 ## `numrange`
