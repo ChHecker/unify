@@ -270,7 +270,11 @@
     if normal-list.at(0).at("cond") {
       formatted += space
     }
-    formatted += " ("
+
+    if per-list.len() > 0 {
+      formatted += " ("
+    }
+    
     for (i, chunk) in normal-list.enumerate() {
       let (string: n, cond: space-set) = chunk
       if i != 0 and space-set {
@@ -278,6 +282,11 @@
       }
       formatted += n
     }
+
+    if per-list.len() == 0 {
+      return formatted
+    }
+
     formatted += ")/("
     for (i, chunk) in per-list.enumerate() {
       let (string: p, cond: space-set) = chunk
@@ -416,7 +425,11 @@
     if normal-list.at(0).at("cond") {
       formatted += space
     }
+
+    if per-list.len() > 0 {
       formatted += " ("
+    }
+
     for (i, chunk) in normal-list.enumerate() {
       let (string: n, cond: space-set) = chunk
       if i != 0 and space-set {
@@ -424,6 +437,11 @@
       }
       formatted += n
     }
+
+    if per-list.len() == 0 {
+      return formatted
+    }
+
     formatted += ")/("
     for (i, chunk) in per-list.enumerate() {
       let (string: p, cond: space-set) = chunk
