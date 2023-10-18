@@ -208,7 +208,6 @@
 
   let prefixes = ()
   for (string: string, cond: per-set) in chunks {
-    let acc = ""
     let u-space = true
     let prefix = none
     let unit = ""
@@ -218,16 +217,29 @@
     let quantity = qty-exp.at(0)
     exponent = qty-exp.at(1, default: none)
 
-    for char in quantity.clusters() {
-      acc += char
-      if acc in prefixes-short and prefix == none {
-        prefix = prefixes-short.at(acc)
-        acc = ""
-      } else if acc in units-short {
-        unit = units-short.at(acc)
-        u-space = units-short-space.at(acc)
-        acc = ""
-      } else if acc.len() == quantity.len() {
+    if quantity in units-short {
+      // Match units without prefixes
+      unit = units-short.at(quantity)
+      u-space = units-short-space.at(quantity)
+    } else {
+      // Match prefix + unit
+      let pre = ""
+      for char in quantity.clusters() {
+        pre += char
+        // Divide `quantity` into `pre`+`u` and check validity
+        if pre in prefixes-short {
+          let u = quantity.trim(pre, at: start, repeat: false)
+          if u in units-short {
+            prefix = prefixes-short.at(pre)
+            unit = units-short.at(u)
+            u-space = units-short-space.at(u)
+
+            pre = none
+            break
+          }
+        }
+      }
+      if pre != none {
         panic("invalid unit: " + quantity)
       }
     }
