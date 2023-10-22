@@ -24,6 +24,7 @@
   let dec-part = split.at(1, default: none)
   let int-list = int-part.clusters()
 
+  string += str(int-list.remove(0))
   for (i, n) in int-list.enumerate() {
     let mod = (i - int-list.len()) / 3
     if int(mod) == mod {
