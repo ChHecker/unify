@@ -9,6 +9,7 @@ litre,l,upright("l"),true
 liter,L,upright("L"),true
 second,s,upright("s"),true
 minute,min,upright("min"),true
+hour,h,upright("h"),true
 day,d,upright("d"),true
 year,a,upright("a"),true
 year,yr,upright("a"),true
