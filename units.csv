@@ -18,6 +18,7 @@ ton,t,upright("t"),true
 tonne,t,upright("t"),true
 newton,N,upright("N"),true
 pascal,Pa,upright("Pa"),true
+bar,bar,upright("bar"),true
 joule,J,upright("J"),true
 erg,erg,upright("erg"),true
 electronvolt,eV,upright("eV"),true
@@ -25,6 +26,7 @@ watt,W,upright("W"),true
 ampere,A,upright("A"),true
 volt,V,upright("V"),true
 ohm,O,upright("Ω"),true
+siemens,S,upright("S"),true
 tesla,T,upright("T"),true
 gauss,G,upright("G"),true
 henry,H,upright("H"),true
