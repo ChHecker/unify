@@ -1,5 +1,5 @@
 #let re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e([-\+]?\d+))?$")
-
+#let unicode_exponents = (("\u2070", "0"), ("\u00B9", "1"), ("\u00B2", "2"), ("\u00B3", "3"), ("\u2074", "4"), ("\u2075", "5"), ("\u2076", "6"), ("\u2077", "7"), ("\u2078", "8"), ("\u2079", "9"), ("\u207A", "+"), ("\u207B", "-"))
 
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
   /// Formats a float with thousands separator.
@@ -176,6 +176,23 @@
 #let (units, units-short, units-space, units-short-space) = _unit-csv("units.csv")
 #let postfixes = _postfix-csv("postfixes.csv")
 
+#let unicode_exponent_list = for (unicode, ascii) in unicode_exponents {(unicode,)}
+#let exponent_pattern = regex("[" + unicode_exponent_list.join("|") + "]+")
+
+#let _replace_unicode_exponents(unit_str) = {
+  let exponent_matches = unit_str.matches(exponent_pattern)
+  let exponent = ""
+  for match in exponent_matches {
+    
+    exponent = "^" + match.text
+    for (unicode, ascii) in unicode_exponents {
+      exponent = exponent.replace(regex(unicode), ascii)
+    }
+    unit_str = unit_str.replace(match.text, exponent)
+  }
+  unit_str
+}
+
 #let chunk(string, cond) = (string: string, cond: cond)
 
 #let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol") = {
@@ -188,6 +205,8 @@
 
   let formatted = ""
 
+  string = _replace_unicode_exponents(string)
+  
   let split = string
     .replace(regex(" */ *"), "/")
     .replace(regex(" +"), " ")
