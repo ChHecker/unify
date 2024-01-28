@@ -18,6 +18,7 @@ ton,t,upright("t"),true
 tonne,t,upright("t"),true
 newton,N,upright("N"),true
 pascal,Pa,upright("Pa"),true
+atmosphere,atm,upright("atm"),true
 joule,J,upright("J"),true
 erg,erg,upright("erg"),true
 electronvolt,eV,upright("eV"),true
@@ -46,4 +47,3 @@ percent,%,percent,true
 decibel,dB,upright("dB"),true
 neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
-atmosphere, atm, upright("atm"), true
