@@ -5,7 +5,7 @@
   /// Formats a float with thousands separator.
   /// - `f`: Float to format.
   /// - `decsep`: Which decimal separator to use. This must be the same as the one used in `f`. Set it to `auto` to automatically choose it. Falls back to `.`.
-  /// - `thousandsep`: The seperator between the thousands.
+  /// - `thousandsep`: The separator between the thousands.
   let string = ""
   if decsep == "auto" {
     if "," in f {
@@ -54,7 +54,7 @@
   /// - `exponent`: Exponent in the exponential notation.
   /// - `upper`: Upper uncertainty.
   /// - `lower`: Lower uncertainty.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
 
   let formatted-value = ""
   if value != none {
@@ -88,7 +88,7 @@
 #let num(value, thousandsep: "#h(0.166667em)") = {
   /// Format a number.
   /// - `value`: String with the number.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
 
   value = str(value).replace(" ", "")//.replace(",", ".")
   let match-value = value.match(re-num)
@@ -507,7 +507,7 @@
   /// - `unit`: String containing the unit.
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `space`: Space between units.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   value = str(value).replace(" ", "")
@@ -553,7 +553,7 @@
   /// - `(exponent-lower, exponent-upper)`: Strings containing the exponentials in exponential notation.
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
   /// - `force-parentheses`: Whether to force parentheses around the range.
 
   let formatted-value = ""
@@ -587,7 +587,7 @@
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
   lower = str(lower).replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid lower number: " + lower)
@@ -623,7 +623,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `unitspace`: Space between units.
-  /// - `thousandsep`: The seperator between the thousands of the float.
+  /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   lower = str(lower).replace(" ", "")
