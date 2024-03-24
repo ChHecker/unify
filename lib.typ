@@ -89,8 +89,10 @@
   /// Format a number.
   /// - `value`: String with the number.
   /// - `thousandsep`: The separator between the thousands of the float.
+  
+  // str() converts minus "-" of a number to unicode "\u2212"
+  value = str(value).replace("−", "-").replace(" ", "")//.replace(",", ".")
 
-  value = str(value).replace(" ", "")//.replace(",", ".")
   let match-value = value.match(re-num)
   assert.ne(match-value, none, message: "invalid number: " + value)
   let captures-value = match-value.captures
@@ -510,7 +512,7 @@
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
-  value = str(value).replace(" ", "")
+  value = str(value).replace("−", "-").replace(" ", "")
   let match-value = value.match(re-num)
   assert.ne(match-value, none, message: "invalid number: " + value)
   let captures-value = match-value.captures
@@ -588,12 +590,12 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
-  lower = str(lower).replace(" ", "")
+  lower = str(lower).replace("−", "-").replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid lower number: " + lower)
   let captures-lower = match-lower.captures
 
-  upper = str(upper).replace(" ", "")
+  upper = str(upper).replace("−", "-").replace(" ", "")
   let match-upper = upper.match(re-num)
   assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
@@ -626,12 +628,12 @@
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
-  lower = str(lower).replace(" ", "")
+  lower = str(lower).replace("−", "-").replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid lower number: " + lower)
   let captures-lower = match-lower.captures
 
-  upper = str(upper).replace(" ", "")
+  upper = str(upper).replace("−", "-").replace(" ", "")
   let match-upper = upper.match(re-num)
   assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
