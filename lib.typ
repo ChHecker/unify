@@ -48,12 +48,15 @@
   string
 }
 
-#let _format-num(value, exponent: none, upper: none, lower: none, thousandsep: "#h(0.166667em)") = {
+#let _format-num(
+  value, exponent: none, upper: none, lower: none,
+  multiplier: "dot", thousandsep: "#h(0.166667em)") = {
   /// Format a number.
   /// - `value`: Value of the number.
   /// - `exponent`: Exponent in the exponential notation.
   /// - `upper`: Upper uncertainty.
   /// - `lower`: Lower uncertainty.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
 
   let formatted-value = ""
@@ -78,16 +81,17 @@
   }
   if exponent != none {
     if value != none {
-      formatted-value += " dot "
+      formatted-value += " " + multiplier + " "
     }
     formatted-value += "10^(" + str(exponent) + ")"
   }
   formatted-value
 }
 
-#let num(value, thousandsep: "#h(0.166667em)") = {
+#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)") = {
   /// Format a number.
   /// - `value`: String with the number.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
 
   value = str(value).replace(" ", "")//.replace(",", ".")
@@ -110,6 +114,7 @@
     exponent: captures-value.at(17),
     upper: upper,
     lower: lower,
+    multiplier: multiplier,
     thousandsep: thousandsep
   )
 
@@ -501,10 +506,13 @@
   eval(formatted)
 }
 
-#let qty(value, unit, rawunit: false, space: "#h(0.166667em)", thousandsep: "#h(0.166667em)", per: "symbol") = {
+#let qty(
+  value, unit, rawunit: false, space: "#h(0.166667em)",
+  multiplier: "dot", thousandsep: "#h(0.166667em)", per: "symbol") = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `space`: Space between units.
   /// - `thousandsep`: The separator between the thousands of the float.
@@ -530,6 +538,7 @@
     exponent: captures-value.at(17),
     upper: upper,
     lower: lower,
+    multiplier: multiplier,
     thousandsep: thousandsep
   )
 
@@ -545,12 +554,13 @@
 }
 
 #let _format-range(
-  lower, upper, exponent-lower: none, exponent-upper: none,
+  lower, upper, exponent-lower: none, exponent-upper: none, multiplier: "dot",
   delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)", force-parentheses: false
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `(exponent-lower, exponent-upper)`: Strings containing the exponentials in exponential notation.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
@@ -561,20 +571,20 @@
   formatted-value += _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-lower != none {
     if lower != none {
-      formatted-value += "dot "
+      formatted-value += multiplier + " "
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
   formatted-value += space + " " + delimiter + " " + space + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
-      formatted-value += "dot "
+      formatted-value += multiplier + " "
     }
     formatted-value += "10^(" + str(exponent-upper) + ")"
   }
   if exponent-lower == exponent-upper and (exponent-lower != none and exponent-upper != none) {
     formatted-value = "lr((" + formatted-value
-    formatted-value += ")) dot 10^(" + str(exponent-lower) + ")"
+    formatted-value += ")) " + multiplier + " 10^(" + str(exponent-lower) + ")"
   } else if force-parentheses {
     formatted-value = "lr((" + formatted-value
     formatted-value += "))"
@@ -582,9 +592,12 @@
   formatted-value
 }
 
-#let numrange(lower, upper, delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)") = {
+#let numrange(
+  lower, upper, multiplier: "dot",
+  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)") = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
@@ -603,6 +616,7 @@
     captures-upper.at(0),
     exponent-lower: captures-lower.at(17),
     exponent-upper: captures-upper.at(17),
+    multiplier: multiplier,
     delimiter: delimiter,
     thousandsep: thousandsep,
     space: space,
@@ -613,13 +627,14 @@
 }
 
 #let qtyrange(
-  lower, upper, unit, rawunit: false, delimiter: "-", space: "",
+  lower, upper, unit, rawunit: false, multiplier: "dot", delimiter: "-", space: "",
   unitspace: "#h(0.16667em)", thousandsep: "#h(0.166667em)", per: "symbol"
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `unit`: String containing the unit.
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
+  /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `unitspace`: Space between units.
@@ -641,6 +656,7 @@
     captures-upper.at(0),
     exponent-lower: captures-lower.at(17),
     exponent-upper: captures-upper.at(17),
+    multiplier: multiplier,
     delimiter: delimiter,
     space: space,
     thousandsep: thousandsep,
