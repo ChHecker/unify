@@ -5,7 +5,7 @@
 ## Overview
 `unify` allows flexible numbers and units, and still mostly gets well typeset results.
 ```typ
-#import "@preview/unify:0.4.3": num,qty,numrange,qtyrange
+#import "@preview/unify:0.5.0": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
 $ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
@@ -23,7 +23,7 @@ $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\
     - asymmetric uncertainties with `+{}-{}`
 - exponential notation `e{}`
 
-Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands.
+Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential.
 
 
 ## `unit`
