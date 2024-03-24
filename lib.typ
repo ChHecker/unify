@@ -590,7 +590,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
-  lower = str(lower).replace(" ", "")
+  lower = str(lower).replace("−", "-").replace(" ", "")
   let match-lower = lower.match(re-num)
   assert.ne(match-lower, none, message: "invalid lower number: " + lower)
   let captures-lower = match-lower.captures
