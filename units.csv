@@ -40,6 +40,7 @@ candela,cd,upright("cd"),true
 lumen,lm,upright("lm"),true
 lux,lx,upright("lx"),true
 degree,d,degree,false
+radian,r,upright("rad"),true
 arcminute,',',false
 arcsecond,\",″,false
 mole,mol,upright("mol"),true
