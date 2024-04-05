@@ -179,9 +179,39 @@
   (units, units-short, units-space, units-short-space)
 }
 
-#let (prefixes, prefixes-short) = _prefix-csv("prefixes.csv")
-#let (units, units-short, units-space, units-short-space) = _unit-csv("units.csv")
 #let postfixes = _postfix-csv("postfixes.csv")
+
+#let lang-db = state("lang-db",(
+  "en":(
+    "units":(_unit-csv("units-en.csv")),
+    "prefixes":(_prefix-csv("prefixes-en.csv")),
+    ),
+  "ru":(
+    "units":(_unit-csv("units-ru.csv")),
+    "prefixes":(_prefix-csv("prefixes-ru.csv")),
+    ),
+  )
+)
+// get units
+#let __inits() = {
+  let lang = text.lang
+  let data = lang-db.get()
+  if lang in data {
+    data.at(lang).units
+  } else {
+    data.en.units
+  }
+}
+// get prefixes
+#let __prefixes() = {
+  let lang = text.lang
+  let data = lang-db.get()
+  if lang in data {
+    data.at(lang).prefixes
+  } else {
+    data.en.prefixes
+  }
+}
 
 #let unicode_exponent_list = for (unicode, ascii) in unicode_exponents {(unicode,)}
 #let exponent_pattern = regex("[" + unicode_exponent_list.join("|") + "]+")
@@ -202,7 +232,7 @@
 
 #let chunk(string, cond) = (string: string, cond: cond)
 
-#let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol") = {
+#let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol",units-short, units-short-space, prefixes-short) = {
   /// Format a unit using the shorthand notation.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -348,6 +378,10 @@
 
   assert(per == "symbol" or per == "fraction" or per == "/")
 
+  // load data
+  let (units,units-short,units-space,units-short-space) = __inits()
+  let (prefixes,prefixes-short) = __prefixes()
+
   let formatted = ""
 
   // needed for fraction formatting
@@ -456,7 +490,7 @@
       unit.at("cond") = units-space.at(u)
       post = true
     } else if u != "" {
-      return _format-unit-short(string, space: space, per: per)
+      return _format-unit-short(string, space: space, per: per,units-short, units-short-space, prefixes-short)
     }
   }
 
@@ -501,11 +535,13 @@
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
-  let formatted-unit = ""
-  formatted-unit = _format-unit(unit, space: space, per: per)
+  context {
+    let formatted-unit = ""
+    formatted-unit = _format-unit(unit, space: space, per: per)
 
-  let formatted = "$" + formatted-unit + "$"
-  eval(formatted)
+    let formatted = "$" + formatted-unit + "$"
+    eval(formatted)
+  }
 }
 
 #let qty(
@@ -544,15 +580,17 @@
     thousandsep: thousandsep
   )
 
-  let formatted-unit = ""
-  if rawunit {
-    formatted-unit = space + unit
-  } else {
-    formatted-unit = _format-unit(unit, space: space, per: per)
-  }
+  context {
+    let formatted-unit = ""
+    if rawunit {
+      formatted-unit = space + unit
+    } else {
+      formatted-unit = _format-unit(unit, space: space, per: per)
+    }
 
-  let formatted = "$" + formatted-value + formatted-unit + "$"
-  eval(formatted)
+    let formatted = "$" + formatted-value + formatted-unit + "$"
+    eval(formatted)
+  }
 }
 
 #let _format-range(
@@ -665,13 +703,15 @@
     force-parentheses: true
   )
 
-  let formatted-unit = ""
-  if rawunit {
-    formatted-unit = space + unit
-  } else {
-    formatted-unit = _format-unit(unit, space: unitspace, per: per)
-  }
+  context {
+    let formatted-unit = ""
+    if rawunit {
+      formatted-unit = space + unit
+    } else {
+      formatted-unit = _format-unit(unit, space: unitspace, per: per)
+    }
 
-  let formatted = "$" + formatted-value + formatted-unit + "$"
-  eval(formatted)
+    let formatted = "$" + formatted-value + formatted-unit + "$"
+    eval(formatted)
+  }
 }

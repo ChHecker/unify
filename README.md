@@ -14,6 +14,8 @@ $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\
 ```
 <img src="examples/overview.jpg" width="300">
 
+## Multilingual support 
+The Unify package supports multiple languages. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`, and in the `lib.typ` file you should fix the `lang-db` state for your files.
 
 ## `num`
 `num` uses string parsing in order to typeset numbers, including separators between the thousands. They can have the following form:
