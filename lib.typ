@@ -180,7 +180,8 @@
 }
 
 #let (prefixes, prefixes-short) = _prefix-csv("prefixes.csv")
-#let (units, units-short, units-space, units-short-space) = _unit-csv("units.csv")
+#let (siunits, siunits-short, siunits-space, siunits-short-space) = _unit-csv("units.csv")
+#let (iunits, iunits-short, iunits-space, iunits-short-space) = _unit-csv("imperialunits.csv")
 #let postfixes = _postfix-csv("postfixes.csv")
 
 #let unicode_exponent_list = for (unicode, ascii) in unicode_exponents {(unicode,)}
@@ -202,7 +203,7 @@
 
 #let chunk(string, cond) = (string: string, cond: cond)
 
-#let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol") = {
+#let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol", units, units-short, units-space, units-short-space) = {
   /// Format a unit using the shorthand notation.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -340,7 +341,7 @@
   formatted
 }
 
-#let _format-unit(string, space: "#h(0.166667em)", per: "symbol") = {
+#let _format-unit(string, space: "#h(0.166667em)", per: "symbol", units, units-short, units-space, units-short-space) = {
   /// Format a unit using written-out words.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -456,7 +457,7 @@
       unit.at("cond") = units-space.at(u)
       post = true
     } else if u != "" {
-      return _format-unit-short(string, space: space, per: per)
+      return _format-unit-short(string, space: space, per: per, units, units-short, units-space, units-short-space)
     }
   }
 
@@ -495,14 +496,22 @@
   formatted
 }
 
-#let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
+#let unit(unit, space: "#h(0.166667em)", per: "symbol", units: "SI") = {
   /// Format a unit.
   /// - `unit`: String containing the unit.
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   let formatted-unit = ""
-  formatted-unit = _format-unit(unit, space: space, per: per)
+  
+  if (units == "SI") {
+    formatted-unit = _format-unit(unit, space: space, per: per, siunits, siunits-short, siunits-space, siunits-short-space)
+  } else if (units == "Imperial") {
+    formatted-unit = _format-unit(unit, space: space, per: per, iunits, iunits-short, iunits-space, iunits-short-space)
+  } else {
+    let (units, units-short, units-space, units-short-space) = _unit-csv(units)
+    formatted-unit = _format-unit(unit, space: space, per: per, units, units-short, units-space, units-short-space)
+  }
 
   let formatted = "$" + formatted-unit + "$"
   eval(formatted)
@@ -510,7 +519,7 @@
 
 #let qty(
   value, unit, rawunit: false, space: "#h(0.166667em)",
-  multiplier: "dot", thousandsep: "#h(0.166667em)", per: "symbol") = {
+  multiplier: "dot", thousandsep: "#h(0.166667em)", per: "symbol", units: "SI") = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
@@ -548,7 +557,14 @@
   if rawunit {
     formatted-unit = space + unit
   } else {
-    formatted-unit = _format-unit(unit, space: space, per: per)
+    if (units == "SI") {
+      formatted-unit = _format-unit(unit, space: space, per: per, siunits, siunits-short, siunits-space, siunits-short-space)
+   } else if (units == "Imperial") {
+      formatted-unit = _format-unit(unit, space: space, per: per, iunits, iunits-short, iunits-space, iunits-short-space)
+    } else {
+      let (units, units-short, units-space, units-short-space) = _unit-csv(units)
+      formatted-unit = _format-unit(unit, space: space, per: per, units, units-short, units-space, units-short-space)
+  }
   }
 
   let formatted = "$" + formatted-value + formatted-unit + "$"
@@ -669,7 +685,14 @@
   if rawunit {
     formatted-unit = space + unit
   } else {
-    formatted-unit = _format-unit(unit, space: unitspace, per: per)
+    if (units == "SI") {
+      formatted-unit = _format-unit(unit, space: space, per: per, siunits, siunits-short, siunits-space, siunits-short-space)
+  } else if (units == "Imperial") {
+      formatted-unit = _format-unit(unit, space: space, per: per, iunits, iunits-short, iunits-space, iunits-short-space)
+  } else {
+      let (units, units-short, units-space, units-short-space) = _unit-csv(units)
+      formatted-unit = _format-unit(unit, space: space, per: per, units, units-short, units-space, units-short-space)
+  }
   }
 
   let formatted = "$" + formatted-value + formatted-unit + "$"

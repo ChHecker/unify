@@ -1,0 +1,34 @@
+twip,twip,upright("twip"),true
+thou,th,upright("th"),true
+barleycorn,barleycorn,upright("barleycorn"),true
+inch,in,upright("in"),true
+hand,hh,upright("hh"),true
+foot,ft,upright("ft"),true
+yard,yd,upright("yd"),true
+chain,ch,upright("ch"),true
+furlong,fur,upright("fur"),true
+mile,mi,upright("mi"),true
+league,lea,upright("lea"),true
+fathom,ftm,upright("ftm"),true
+cable,cable,upright("cable"),true
+nauticalmile,nmi,upright("nmi"),true
+squaremile,sqmi,upright("sq mi"),true
+fluidounce,floz,upright("fl oz"),true
+gill,gi,upright("gi"),true
+pint,pt,upright("pt"),true
+quart,qt,upright("qt"),true
+gallon,gal,upright("gal"),true
+minim,minim,upright("♏︎"),true
+fluidscruple,fls,upright("fl ℈"),true
+fluiddrachm,fldr,upright("fl ʒ"),true
+fluidounce,floz,upright("fl ℥"),true
+grain,gr,upright("gr"),true
+drachm,dr,upright("dr"),true
+ounce,oz,upright("oz"),true
+pound,lb,upright("lb"),true
+stone,st,upright("st"),true
+quarter,qtr,upright("qtr"),true
+hundredweight,cwt,upright("cwt"),true
+ton,t,upright("t"),true
+slug,slug,upright("slug"),true
+fahrenheit,dF,degree.f,false
