@@ -4,7 +4,7 @@ lightyear,ly,upright("ly"),true
 parsec,pc,upright("pc"),true
 astronomicalunit,au,upright("au"),true
 angstrom,A,upright("Å"),true
-hectar,ha,upright("ha"),true
+hectare,ha,upright("ha"),true
 litre,l,upright("l"),true
 liter,L,upright("L"),true
 second,s,upright("s"),true
@@ -17,6 +17,7 @@ hertz,Hz,upright("Hz"),true
 gram,g,upright("g"),true
 ton,t,upright("t"),true
 tonne,t,upright("t"),true
+atomicmassunit,u,upright("u"),true
 newton,N,upright("N"),true
 pascal,Pa,upright("Pa"),true
 atmosphere,atm,upright("atm"),true
@@ -32,6 +33,7 @@ siemens,S,upright("S"),true
 tesla,T,upright("T"),true
 gauss,G,upright("G"),true
 henry,H,upright("H"),true
+weber,Wb,upright("Wb"),true
 farad,F,upright("F"),true
 kelvin,K,upright("K"),true
 celsius,dC,degree.c,false
