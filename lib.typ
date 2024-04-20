@@ -93,7 +93,7 @@
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
-  
+
   // str() converts minus "-" of a number to unicode "\u2212"
   value = str(value).replace("−", "-").replace(" ", "")//.replace(",", ".")
 
@@ -220,7 +220,7 @@
   let exponent_matches = unit_str.matches(exponent_pattern)
   let exponent = ""
   for match in exponent_matches {
-    
+
     exponent = "^" + match.text
     for (unicode, ascii) in unicode_exponents {
       exponent = exponent.replace(regex(unicode), ascii)
@@ -232,7 +232,10 @@
 
 #let chunk(string, cond) = (string: string, cond: cond)
 
-#let _format-unit-short(string, space: "#h(0.166667em)", per: "symbol",units-short, units-short-space, prefixes-short) = {
+#let _format-unit-short(
+  string, space: "#h(0.166667em)", per: "symbol",
+  units-short, units-short-space, prefixes-short
+) = {
   /// Format a unit using the shorthand notation.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -243,7 +246,7 @@
   let formatted = ""
 
   string = _replace_unicode_exponents(string)
-  
+
   let split = string
     .replace(regex(" */ *"), "/")
     .replace(regex(" +"), " ")
@@ -343,7 +346,7 @@
     if per-list.len() > 0 {
       formatted += " ("
     }
-    
+
     for (i, chunk) in normal-list.enumerate() {
       let (string: n, cond: space-set) = chunk
       if i != 0 and space-set {
@@ -379,8 +382,8 @@
   assert(per == "symbol" or per == "fraction" or per == "/")
 
   // load data
-  let (units,units-short,units-space,units-short-space) = __inits()
-  let (prefixes,prefixes-short) = __prefixes()
+  let (units, units-short, units-space, units-short-space) = __inits()
+  let (prefixes, prefixes-short) = __prefixes()
 
   let formatted = ""
 
@@ -490,7 +493,7 @@
       unit.at("cond") = units-space.at(u)
       post = true
     } else if u != "" {
-      return _format-unit-short(string, space: space, per: per,units-short, units-short-space, prefixes-short)
+      return _format-unit-short(string, space: space, per: per, units-short, units-short-space, prefixes-short)
     }
   }
 
