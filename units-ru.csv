@@ -34,8 +34,8 @@ gauss,G,upright("Гс"),true
 henry,H,upright("Гн"),true
 farad,F,upright("Ф"),true
 kelvin,K,upright("K"),true
-celsius,dC,degree.c,false
-fahrenheit,dF,degree.f,false
+celsius,dC,degree.c,true
+fahrenheit,dF,degree.f,true
 candela,cd,upright("кд"),true
 lumen,lm,upright("лм"),true
 lux,lx,upright("лк"),true
