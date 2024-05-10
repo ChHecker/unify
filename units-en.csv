@@ -36,8 +36,8 @@ henry,H,upright("H"),true
 weber,Wb,upright("Wb"),true
 farad,F,upright("F"),true
 kelvin,K,upright("K"),true
-celsius,dC,degree.c,false
-fahrenheit,dF,degree.f,false
+celsius,dC,degree.c,true
+fahrenheit,dF,degree.f,true
 candela,cd,upright("cd"),true
 lumen,lm,upright("lm"),true
 lux,lx,upright("lx"),true
