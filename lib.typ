@@ -176,8 +176,29 @@
       units-short-space.insert(line.at(1), true)
     }
   }
+
   (units, units-short, units-space, units-short-space)
 }
+
+#let _add-money-units(data) = {
+  let (units, units-short, units-space, units-short-space) = data
+
+  let array = csv("money.csv", delimiter: ",")
+  for line in array {
+    units.insert(lower(line.at(0)), line.at(2))
+    units-short.insert(line.at(1), line.at(2))
+    if line.at(3) == "false" or line.at(3) == "0" {
+      units-space.insert(lower(line.at(0)), false)
+      units-short-space.insert(line.at(1), false)
+    } else {
+      units-space.insert(lower(line.at(0)), true)
+      units-short-space.insert(line.at(1), true)
+    }
+  }
+  
+  (units, units-short, units-space, units-short-space)
+}
+
 
 #let postfixes = _postfix-csv("postfixes.csv")
 
@@ -197,9 +218,9 @@
   let lang = text.lang
   let data = lang-db.get()
   if lang in data {
-    data.at(lang).units
+    _add-money-units(data.at(lang).units)
   } else {
-    data.en.units
+    _add-money-units(data.en.units)
   }
 }
 // get prefixes
@@ -383,6 +404,7 @@
 
   // load data
   let (units, units-short, units-space, units-short-space) = __inits()
+
   let (prefixes, prefixes-short) = __prefixes()
 
   let formatted = ""
