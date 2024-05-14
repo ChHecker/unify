@@ -45,6 +45,7 @@ degree,d,degree,false
 radian,r,upright("rad"),true
 arcminute,',',false
 arcsecond,\",″,false
+steradian,sr,upright("sr"),true
 mole,mol,upright("mol"),true
 becquerel,Bq,upright("Bq"),true
 gray,Gy,upright("Gy"),true
@@ -53,3 +54,4 @@ percent,%,percent,true
 decibel,dB,upright("dB"),true
 neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
+katal,kat,upright("kat"),true
