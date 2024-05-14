@@ -19,6 +19,7 @@ ton,t,upright("t"),true
 tonne,t,upright("t"),true
 atomicmassunit,u,upright("u"),true
 newton,N,upright("N"),true
+dyne,dyn,upright("dyn"),true
 pascal,Pa,upright("Pa"),true
 atmosphere,atm,upright("atm"),true
 bar,bar,upright("bar"),true
