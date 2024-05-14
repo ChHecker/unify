@@ -10,7 +10,7 @@
   if decsep == "auto" {
     if "," in f {
       decsep = ","
-    } else{
+    } else {
       decsep = "."
     }
   }
@@ -213,6 +213,7 @@
     ),
   )
 )
+
 // get units
 #let __inits() = {
   let lang = text.lang
@@ -223,6 +224,7 @@
     _add-money-units(data.en.units)
   }
 }
+
 // get prefixes
 #let __prefixes() = {
   let lang = text.lang
@@ -633,14 +635,14 @@
 
   let formatted-value = ""
 
-  formatted-value += _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+  formatted-value += _format-num(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-lower != none {
     if lower != none {
       formatted-value += multiplier + " "
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + " " + delimiter + " " + space + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+  formatted-value += space + " " + delimiter + " " + space + _format-num(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
       formatted-value += multiplier + " "
