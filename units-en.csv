@@ -56,3 +56,4 @@ decibel,dB,upright("dB"),true
 neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
 katal,kat,upright("kat"),true
+molar,M,upright(#text(size: 0.85em)[M]),true
