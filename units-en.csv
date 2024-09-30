@@ -56,3 +56,5 @@ decibel,dB,upright("dB"),true
 neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
 katal,kat,upright("kat"),true
+byte,B,upright("B"),true
+bit,b,upright("b"),true
