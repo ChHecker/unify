@@ -1,4 +1,4 @@
-#let _re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e([-\+]?\d+))?$")
+#let _re-num = regex("^(-?\d+(\.|,)?\d*(/\d+(\.|,)?\d*)?)?(((\+(\d+(\.|,)?\d*(/\d+(\.|,)?\d*)?)-(\d+(\.|,)?\d*(/\d+(\.|,)?\d*)?)))|((((\+-)|(-\+))(\d+(\.|,)?\d*(/\d+(\.|,)?\d*)?))))?(e([-\+]?\d+))?$")
 #let _unicode-exponents = (("\u2070", "0"), ("\u00B9", "1"), ("\u00B2", "2"), ("\u00B3", "3"), ("\u2074", "4"), ("\u2075", "5"), ("\u2076", "6"), ("\u2077", "7"), ("\u2078", "8"), ("\u2079", "9"), ("\u207A", "+"), ("\u207B", "-"))
 
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
@@ -48,6 +48,17 @@
   string
 }
 
+#let _format-frac(f) = {
+  let string = ""
+  let split = str(f).split("/")
+  let numerator = split.at(0)
+  let denominator = split.at(1)
+
+  string += numerator + "/" + denominator
+  
+  string
+}
+
 #let _format-num(
   value, exponent: none, upper: none, lower: none,
   multiplier: "dot", thousandsep: "#h(0.166667em)") = {
@@ -60,8 +71,11 @@
   /// - `thousandsep`: The separator between the thousands of the float.
 
   let formatted-value = ""
-  if value != none {
+  if value != none and not str(value).contains("/") {
     formatted-value += _format-float(value, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+  }
+  if value != none and str(value).contains("/") {
+    formatted-value += _format-frac(value)
   }
   if upper != none and lower != none {
     if upper != lower {
@@ -103,17 +117,17 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(14) != none {
-    upper = captures-value.at(14)
+  if captures-value.at(20) != none {
+    upper = captures-value.at(20)
     lower = none
   } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
+    upper = captures-value.at(7)
+    lower = captures-value.at(11)
   }
 
   let formatted = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(17),
+    exponent: captures-value.at(25),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -590,17 +604,17 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(14) != none {
-    upper = captures-value.at(14)
+  if captures-value.at(20) != none {
+    upper = captures-value.at(20)
     lower = none
   } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
+    upper = captures-value.at(7)
+    lower = captures-value.at(11)
   }
 
   let formatted-value = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(17),
+    exponent: captures-value.at(25),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -681,8 +695,8 @@
   let formatted = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(17),
-    exponent-upper: captures-upper.at(17),
+    exponent-lower: captures-lower.at(25),
+    exponent-upper: captures-upper.at(25),
     multiplier: multiplier,
     delimiter: delimiter,
     thousandsep: thousandsep,
@@ -721,8 +735,8 @@
   let formatted-value = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(17),
-    exponent-upper: captures-upper.at(17),
+    exponent-lower: captures-lower.at(25),
+    exponent-upper: captures-upper.at(25),
     multiplier: multiplier,
     delimiter: delimiter,
     space: space,
