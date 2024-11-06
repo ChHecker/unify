@@ -14,6 +14,7 @@ day,d,upright("d"),true
 year,a,upright("a"),true
 year,yr,upright("a"),true
 hertz,Hz,upright("Hz"),true
+speedoflight,c,c,true
 gram,g,upright("g"),true
 ton,t,upright("t"),true
 tonne,t,upright("t"),true
