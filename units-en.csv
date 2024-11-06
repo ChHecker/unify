@@ -48,6 +48,7 @@ arcminute,',',false
 arcsecond,\",″,false
 steradian,sr,upright("sr"),true
 mole,mol,upright("mol"),true
+molar,M,upright("M"),true
 becquerel,Bq,upright("Bq"),true
 gray,Gy,upright("Gy"),true
 sievert,Sv,upright("Sv"),true
