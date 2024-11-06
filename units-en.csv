@@ -5,6 +5,7 @@ parsec,pc,upright("pc"),true
 astronomicalunit,au,upright("au"),true
 angstrom,A,upright("Å"),true
 hectare,ha,upright("ha"),true
+barn,b,upright("b"),true
 litre,l,upright("l"),true
 liter,L,upright("L"),true
 second,s,upright("s"),true
@@ -56,4 +57,3 @@ decibel,dB,upright("dB"),true
 neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
 katal,kat,upright("kat"),true
-barn,b,upright("b"),true
