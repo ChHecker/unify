@@ -1,5 +1,18 @@
-#let _re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?(e([-\+]?\d+))?$")
-#let _unicode-exponents = (("\u2070", "0"), ("\u00B9", "1"), ("\u00B2", "2"), ("\u00B3", "3"), ("\u2074", "4"), ("\u2075", "5"), ("\u2076", "6"), ("\u2077", "7"), ("\u2078", "8"), ("\u2079", "9"), ("\u207A", "+"), ("\u207B", "-"))
+#let _re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?((e|E)([-\+]?\d+))?$")
+#let _unicode-exponents = (
+  ("\u2070", "0"),
+  ("\u00B9", "1"),
+  ("\u00B2", "2"),
+  ("\u00B3", "3"),
+  ("\u2074", "4"),
+  ("\u2075", "5"),
+  ("\u2076", "6"),
+  ("\u2077", "7"),
+  ("\u2078", "8"),
+  ("\u2079", "9"),
+  ("\u207A", "+"),
+  ("\u207B", "-"),
+)
 
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
   /// Formats a float with thousands separator.
@@ -49,8 +62,13 @@
 }
 
 #let _format-num(
-  value, exponent: none, upper: none, lower: none,
-  multiplier: "dot", thousandsep: "#h(0.166667em)") = {
+  value,
+  exponent: none,
+  upper: none,
+  lower: none,
+  multiplier: "dot",
+  thousandsep: "#h(0.166667em)",
+) = {
   /// Format a number.
   /// - `value`: Value of the number.
   /// - `exponent`: Exponent in the exponential notation.
@@ -95,7 +113,7 @@
   /// - `thousandsep`: The separator between the thousands of the float.
 
   // str() converts minus "-" of a number to unicode "\u2212"
-  value = str(value).replace("−", "-").replace(" ", "")//.replace(",", ".")
+  value = str(value).replace("−", "-").replace(" ", "") //.replace(",", ".")
 
   let match-value = value.match(_re-num)
   assert.ne(match-value, none, message: "invalid number: " + value)
@@ -113,11 +131,11 @@
 
   let formatted = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(17),
+    exponent: captures-value.at(18),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
-    thousandsep: thousandsep
+    thousandsep: thousandsep,
   )
 
   formatted = "$" + formatted + "$"
@@ -195,23 +213,25 @@
       units-short-space.insert(line.at(1), true)
     }
   }
-  
+
   (units, units-short, units-space, units-short-space)
 }
 
 
 #let postfixes = _postfix-csv("postfixes.csv")
 
-#let lang-db = state("lang-db",(
-  "en":(
-    "units":(_unit-csv("units-en.csv")),
-    "prefixes":(_prefix-csv("prefixes-en.csv")),
+#let lang-db = state(
+  "lang-db",
+  (
+    "en": (
+      "units": (_unit-csv("units-en.csv")),
+      "prefixes": (_prefix-csv("prefixes-en.csv")),
     ),
-  "ru":(
-    "units":(_unit-csv("units-ru.csv")),
-    "prefixes":(_prefix-csv("prefixes-ru.csv")),
+    "ru": (
+      "units": (_unit-csv("units-ru.csv")),
+      "prefixes": (_prefix-csv("prefixes-ru.csv")),
     ),
-  )
+  ),
 )
 
 // get units
@@ -236,7 +256,9 @@
   }
 }
 
-#let _unicode-exponent-list = for (unicode, ascii) in _unicode-exponents {(unicode,)}
+#let _unicode-exponent-list = for (unicode, ascii) in _unicode-exponents {
+  (unicode,)
+}
 #let _exponent-pattern = regex("[" + _unicode-exponent-list.join("|") + "]+")
 
 #let _replace-unicode-exponents(unit-str) = {
@@ -256,8 +278,12 @@
 #let chunk(string, cond) = (string: string, cond: cond)
 
 #let _format-unit-short(
-  string, space: "#h(0.166667em)", per: "symbol",
-  units-short, units-short-space, prefixes-short
+  string,
+  space: "#h(0.166667em)",
+  per: "symbol",
+  units-short,
+  units-short-space,
+  prefixes-short,
 ) = {
   /// Format a unit using the shorthand notation.
   /// - `string`: String containing the unit.
@@ -270,10 +296,7 @@
 
   string = _replace-unicode-exponents(string)
 
-  let split = string
-    .replace(regex(" */ *"), "/")
-    .replace(regex(" +"), " ")
-    .split(regex(" "))
+  let split = string.replace(regex(" */ *"), "/").replace(regex(" +"), " ").split(regex(" "))
   let chunks = ()
   for s in split {
     let per-split = s.split("/")
@@ -348,7 +371,7 @@
       // }
       final-unit += prefix + unit
       if exponent != none {
-          final-unit += "^(" + exponent + ")"
+        final-unit += "^(" + exponent + ")"
       }
 
       if per-set {
@@ -449,7 +472,7 @@
           formatted += unit.at("string")
           unit = chunk("", true)
           continue
-        // add per
+          // add per
         } else if per-set {
           unit.at("string") += "^(-1)"
 
@@ -462,7 +485,7 @@
 
           formatted += unit.at("string")
           unit = chunk("", true)
-        // finish unit
+          // finish unit
         } else {
           post = false
 
@@ -508,10 +531,10 @@
     // detected per
     if u == "per" {
       per-set = true
-    // add prefix
+      // add prefix
     } else if u in prefixes {
       unit.at("string") += prefixes.at(u)
-    // add unit
+      // add unit
     } else if u in units {
       unit.at("string") += units.at(u)
       unit.at("cond") = units-space.at(u)
@@ -572,8 +595,14 @@
 }
 
 #let qty(
-  value, unit, rawunit: false, space: "#h(0.166667em)",
-  multiplier: "dot", thousandsep: "#h(0.166667em)", per: "symbol") = {
+  value,
+  unit,
+  rawunit: false,
+  space: "#h(0.166667em)",
+  multiplier: "dot",
+  thousandsep: "#h(0.166667em)",
+  per: "symbol",
+) = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
   /// - `unit`: String containing the unit.
@@ -600,11 +629,11 @@
 
   let formatted-value = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(17),
+    exponent: captures-value.at(18),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
-    thousandsep: thousandsep
+    thousandsep: thousandsep,
   )
 
   context {
@@ -621,8 +650,15 @@
 }
 
 #let _format-range(
-  lower, upper, exponent-lower: none, exponent-upper: none, multiplier: "dot",
-  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)", force-parentheses: false
+  lower,
+  upper,
+  exponent-lower: none,
+  exponent-upper: none,
+  multiplier: "dot",
+  delimiter: "-",
+  space: "#h(0.16667em)",
+  thousandsep: "#h(0.166667em)",
+  force-parentheses: false,
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -642,7 +678,10 @@
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + " " + delimiter + " " + space + _format-num(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+  formatted-value += space + " " + delimiter + " " + space + _format-num(upper, thousandsep: thousandsep).replace(
+    ",",
+    ",#h(0pt)",
+  )
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
       formatted-value += multiplier + " "
@@ -660,8 +699,13 @@
 }
 
 #let numrange(
-  lower, upper, multiplier: "dot",
-  delimiter: "-", space: "#h(0.16667em)", thousandsep: "#h(0.166667em)") = {
+  lower,
+  upper,
+  multiplier: "dot",
+  delimiter: "-",
+  space: "#h(0.16667em)",
+  thousandsep: "#h(0.166667em)",
+) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `multiplier`: The symbol used to indicate multiplication
@@ -681,8 +725,8 @@
   let formatted = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(17),
-    exponent-upper: captures-upper.at(17),
+    exponent-lower: captures-lower.at(18),
+    exponent-upper: captures-upper.at(18),
     multiplier: multiplier,
     delimiter: delimiter,
     thousandsep: thousandsep,
@@ -694,8 +738,16 @@
 }
 
 #let qtyrange(
-  lower, upper, unit, rawunit: false, multiplier: "dot", delimiter: "-", space: "",
-  unitspace: "#h(0.16667em)", thousandsep: "#h(0.166667em)", per: "symbol"
+  lower,
+  upper,
+  unit,
+  rawunit: false,
+  multiplier: "dot",
+  delimiter: "-",
+  space: "",
+  unitspace: "#h(0.16667em)",
+  thousandsep: "#h(0.166667em)",
+  per: "symbol",
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -721,13 +773,13 @@
   let formatted-value = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(17),
-    exponent-upper: captures-upper.at(17),
+    exponent-lower: captures-lower.at(18),
+    exponent-upper: captures-upper.at(18),
     multiplier: multiplier,
     delimiter: delimiter,
     space: space,
     thousandsep: thousandsep,
-    force-parentheses: true
+    force-parentheses: true,
   )
 
   context {
