@@ -1,11 +1,11 @@
 # Unify
-`unify` is a [Typst](https://github.com/typst/typst) package simplifying the typesetting of numbers, (physical and monetary) units, and ranges. It is the equivalent to LaTeX's `siunitx`, though not as mature.
+`unify` is a [Typst](https://github.com/typst/typst) package simplifying the typesetting of numbers, units, and ranges. It is the equivalent to LaTeX's `siunitx`, though not as mature.
 
 
 ## Overview
 `unify` allows flexible numbers and units, and still mostly gets well typeset results.
 ```typ
-#import "@preview/unify:0.6.0": num,qty,numrange,qtyrange
+#import "@preview/unify:0.6.1": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
 $ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
@@ -13,6 +13,8 @@ $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
 $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
 ```
 <img src="examples/overview.jpg" width="300">
+
+Right now, physical, monetary, and binary units are supported. New issues or pull requests for new units are welcome!
 
 ## Multilingual support 
 The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`, and in the `lib.typ` file you should fix the `lang-db` state for your files.
