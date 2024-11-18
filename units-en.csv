@@ -44,7 +44,7 @@ fahrenheit,dF,degree.f,true
 candela,cd,upright("cd"),true
 lumen,lm,upright("lm"),true
 lux,lx,upright("lx"),true
-degree,d,degree,false
+degree,deg,degree,false
 radian,r,upright("rad"),true
 arcminute,',',false
 arcsecond,\",″,false
