@@ -13,7 +13,7 @@ minute,min,upright("min"),true
 hour,h,upright("h"),true
 day,d,upright("d"),true
 year,a,upright("a"),true
-year,yr,upright("a"),true
+year,yr,upright("yr"),true
 hertz,Hz,upright("Hz"),true
 speedoflight,c,c,true
 gram,g,upright("g"),true
