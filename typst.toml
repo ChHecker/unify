@@ -6,4 +6,15 @@ authors = ["Christopher Hecker"]
 repository = "https://github.com/ChHecker/unify"
 license = "MIT"
 description = "Format numbers, units, and ranges correctly."
+keywords = ["numbers", "units", "ranges"]
+categories = ["text"]
+disciplines = [
+    "business",
+    "chemistry",
+    "computer-science",
+    "economics",
+    "engineering",
+    "mathematics",
+    "physics",
+]
 exclude = ["examples"]
