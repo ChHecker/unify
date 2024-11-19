@@ -36,6 +36,42 @@
   eval(formatted)
 }
 
+#let add-unit(unit, shorthand, symbol, space: true) = {
+  /// Add a new unit.
+  /// - `unit`: Full name of the unit.
+  /// - `shorthand`: Shorthand of the unit, usually only 1-2 letters.
+  /// - `symbol`: String that will be inserted as the unit symbol.
+  /// - `space`: Whether to put a space before the unit.
+  context {
+    let lang = _get-language()
+
+    _lang-db.update(db => {
+      db.at(lang).at("units").at(0).insert(unit, symbol)
+      db.at(lang).at("units").at(1).insert(shorthand, symbol)
+      db.at(lang).at("units").at(2).insert(unit, space)
+      db.at(lang).at("units").at(3).insert(shorthand, space)
+      db
+    })
+  }
+}
+
+#let add-prefix(prefix, shorthand, symbol) = {
+  /// Add a new prefix.
+  /// - `prefix`: Full name of the prefix.
+  /// - `shorthand`: Shorthand of the prefix, usually only 1-2 letters.
+  /// - `symbol`: String that will be inserted as the prefix symbol.
+  context {
+    let lang = _get-language()
+
+    _lang-db.update(db => {
+      db.at(lang).at("prefixes").at(0).insert(prefix, symbol)
+      db.at(lang).at("prefixes").at(1).insert(shorthand, symbol)
+      db
+    })
+  }
+}
+
+
 #let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
   /// Format a unit.
   /// - `unit`: String containing the unit.

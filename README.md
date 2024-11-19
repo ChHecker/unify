@@ -5,7 +5,7 @@
 ## Overview
 `unify` allows flexible numbers and units, and still mostly gets well typeset results.
 ```typ
-#import "@preview/unify:0.6.1": num,qty,numrange,qtyrange
+#import "@preview/unify:0.7.0": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
 $ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
@@ -40,13 +40,13 @@ Units in words have four possible parts:
 
 The shorthand notation also has four parts:
 - `/` forms the inverse of the following unit.
-- A short prefix in the sense of SI (e.g. `c`). This is added before the unit.
+- A short prefix in the sense of SI (e.g. `k`). This is added before the unit.
 - The short unit itself (e.g. `g`).
 - An exponent like `^2`. This is added after the unit and takes `/` into account.
 
 Note: Use `u` for micro.
 
-The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). There, you can also add your own units. The formats for the pre- and postfixes are:
+The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). Your own units etc. can be permanently added in these files. At runtime, they can be added using `add-unit` and `add-prefix`, respectively. The formats for the pre- and postfixes are:
 
 | pre-/postfix | shorthand | symbol       |
 | ------------ | --------- | ------------ |
