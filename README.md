@@ -31,7 +31,7 @@ Parentheses are automatically set as necessary. Use `thousandsep` to change the 
 
 
 ## `unit`
-`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), and `fraction` or `/` using fraction.  
+`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), `fraction` or `/` using fraction, and `fraction-short` or `\\/` using in-line fractions.  
 Units in words have four possible parts:
 - `per` forms the inverse of the following unit.
 - A written-out prefix in the sense of SI (e.g. `centi`). This is added before the unit.
