@@ -143,7 +143,7 @@
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `/` with a fraction or exponent.
 
-  assert(per == "symbol" or per == "fraction" or per == "/")
+  assert(("symbol", "fraction", "/", "fraction-short", "short-fraction", "\\/").contains(per))
 
   let formatted = ""
 
@@ -235,9 +235,7 @@
     }
   }
 
-  // return((normal-list, per-list))
-
-  if per != "symbol" {
+  if per == "fraction" or per == "/" {
     if normal-list.at(0).at("cond") {
       formatted += space
     }
@@ -267,6 +265,20 @@
       formatted += p
     }
     formatted += ")"
+  } else if per == "fraction-short" or per == "\\/" {
+    if normal-list.at(0).at("cond") {
+      formatted += space
+    }
+
+    for (i, chunk) in normal-list.enumerate() {
+      let (string: n, cond: space-set) = chunk
+      formatted += n
+    }
+
+    for (i, chunk) in per-list.enumerate() {
+      let (string: p, cond: space-set) = chunk
+      formatted += "\\/" + p
+    }
   }
 
   formatted
@@ -278,7 +290,7 @@
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` with a fraction or exponent.
 
-  assert(per == "symbol" or per == "fraction" or per == "/")
+  assert(("symbol", "fraction", "/", "fraction-short", "short-fraction", "\\/").contains(per))
 
   // load data
   let (units, units-short, units-space, units-short-space) = _units()
@@ -397,7 +409,7 @@
     }
   }
 
-  if per != "symbol" {
+  if per == "fraction" or per == "/" {
     if normal-list.at(0).at("cond") {
       formatted += space
     }
@@ -427,6 +439,20 @@
       formatted += p
     }
     formatted += ")"
+  } else if per == "fraction-short" or per == "\\/" {
+    if normal-list.at(0).at("cond") {
+      formatted += space
+    }
+
+    for (i, chunk) in normal-list.enumerate() {
+      let (string: n, cond: space-set) = chunk
+      formatted += n
+    }
+
+    for (i, chunk) in per-list.enumerate() {
+      let (string: p, cond: space-set) = chunk
+      formatted += "\\/" + p
+    }
   }
 
   formatted
