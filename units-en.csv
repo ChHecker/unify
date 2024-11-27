@@ -46,6 +46,7 @@ lumen,lm,upright("lm"),true
 lux,lx,upright("lx"),true
 degree,deg,degree,false
 radian,r,upright("rad"),true
+radian,rad,upright("rad"),true
 arcminute,',',false
 arcsecond,\",″,false
 steradian,sr,upright("sr"),true
