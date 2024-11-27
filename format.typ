@@ -198,9 +198,9 @@
           }
         }
       }
-      if pre != none {
-        panic("invalid unit: " + quantity)
-      }
+      // if pre != none {
+      //   panic("invalid unit: " + quantity)
+      // }
     }
 
     if per == "symbol" {
