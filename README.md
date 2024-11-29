@@ -29,6 +29,8 @@ The Unify package supports multiple languages. Currently, the supported language
 
 Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential.
 
+*Note: Because units are evaluated in math mode, plain spaces (`thousandsep: " "`) will not have the desired effect. Use `thousandsep: "space"` instead.*
+
 
 ## `unit`
 `unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), `fraction` or `/` using fraction, and `fraction-short` or `\\/` using in-line fractions.  
