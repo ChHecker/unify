@@ -52,3 +52,4 @@ decibel,dB,upright("дБ"),true
 neper,Np,upright("Нп"),true
 coulomb,C,upright("Кл"),true
 byte,B,upright("Б"),true
+baud,Bd,upright("бод"),true
