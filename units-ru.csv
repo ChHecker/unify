@@ -24,6 +24,7 @@ bar,bar,upright("бар"),true
 joule,J,upright("Дж"),true
 erg,erg,upright("эрг"),true
 electronvolt,eV,upright("еВ"),true
+calorie,cal,upright("кал"),true
 watt,W,upright("Вт"),true
 ampere,A,upright("А"),true
 volt,V,upright("В"),true
