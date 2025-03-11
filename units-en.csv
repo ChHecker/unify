@@ -28,6 +28,7 @@ bar,bar,upright("bar"),true
 joule,J,upright("J"),true
 erg,erg,upright("erg"),true
 electronvolt,eV,upright("eV"),true
+calorie,cal,upright("cal"),true
 watt,W,upright("W"),true
 ampere,A,upright("A"),true
 volt,V,upright("V"),true
