@@ -5,9 +5,10 @@
 ## Overview
 `unify` allows flexible numbers and units, and still mostly gets well typeset results.
 ```typ
-#import "@preview/unify:0.7.1": num,qty,numrange,qtyrange
+#import "@preview/unify:0.7.1": num, qty, numrange, qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
+$ unit("joule per kilo gram per kelvin") $
 $ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
 $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
 $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
