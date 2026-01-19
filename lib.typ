@@ -191,6 +191,7 @@
   space: "",
   unitspace: "#h(0.16667em)",
   thousandsep: "#h(0.166667em)",
+  force-parentheses: true,
   per: "symbol",
 ) = {
   /// Format a range with a unit.
@@ -223,7 +224,7 @@
     delimiter: delimiter,
     space: space,
     thousandsep: thousandsep,
-    force-parentheses: true,
+    force-parentheses: force-parentheses,
   )
 
   context {
