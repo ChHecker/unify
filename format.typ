@@ -155,11 +155,12 @@
 
 #let _format-unit-short(
   string,
-  space: "#h(0.166667em)",
-  per: "symbol",
   units-short,
   units-short-space,
   prefixes-short,
+  space: "#h(0.166667em)",
+  first-space: true,
+  per: "symbol",
 ) = {
   /// Format a unit using the shorthand notation.
   /// - `string`: String containing the unit.
@@ -187,6 +188,7 @@
   // needed for fraction formatting
   let normal-list = ()
   let per-list = ()
+  let first-unit = true
 
   let prefixes = ()
   for (string: string, cond: per-set) in chunks {
@@ -202,7 +204,8 @@
     if quantity in units-short {
       // Match units without prefixes
       unit = units-short.at(quantity)
-      u-space = units-short-space.at(quantity)
+      u-space = units-short-space.at(quantity) and (first-space or not first-unit)
+      first-unit = false
     } else {
       // Match prefix + unit
       let pre = ""
@@ -214,7 +217,8 @@
           if u in units-short {
             prefix = prefixes-short.at(pre)
             unit = units-short.at(u)
-            u-space = units-short-space.at(u)
+            u-space = units-short-space.at(u) and (first-space or not first-unit)
+            first-unit = false
 
             pre = none
             break
@@ -307,7 +311,7 @@
   formatted
 }
 
-#let _format-unit(string, space: "#h(0.166667em)", per: "symbol") = {
+#let _format-unit(string, space: "#h(0.166667em)", first-space: true, per: "symbol") = {
   /// Format a unit using written-out words.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -332,6 +336,8 @@
   let per-set = false
   // whether waiting for a postfix
   let post = false
+  // whether on first unit
+  let first-unit = true
   // one unit
   let unit = _chunk("", true)
 
@@ -427,10 +433,20 @@
       // add unit
     } else if u in units {
       unit.at("string") += units.at(u)
-      unit.at("cond") = units-space.at(u)
+      // if first-unit and not first-space then no space else units-space.at(u)
+      unit.at("cond") = units-space.at(u) and (first-space or not first-unit)
+      first-unit = false
       post = true
     } else if u != "" {
-      return _format-unit-short(string, space: space, per: per, units-short, units-short-space, prefixes-short)
+      return _format-unit-short(
+        string,
+        units-short,
+        units-short-space,
+        prefixes-short,
+        space: space,
+        per: per,
+        first-space: first-space,
+      )
     }
   }
 

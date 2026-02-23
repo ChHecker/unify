@@ -80,7 +80,7 @@
 
   context {
     let formatted-unit = ""
-    formatted-unit = _format-unit(unit, space: space, per: per)
+    formatted-unit = _format-unit(unit, space: space, first-space: false, per: per)
 
     let formatted = "$" + formatted-unit + "$"
     eval(formatted)
