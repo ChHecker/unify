@@ -1,6 +1,8 @@
 #import "init.typ": *
 
-#let _re-num = regex("^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?((e|E)([-\+]?\d+))?$")
+#let _re-num = regex(
+  "^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+))(\d+(\.|,)?\d*))))?((e|E)([-\+]?\d+))?$",
+)
 #let _unicode-exponents = (
   ("\u2070", "0"),
   ("\u00B9", "1"),
@@ -15,6 +17,24 @@
   ("\u207A", "+"),
   ("\u207B", "-"),
 )
+
+#let _to-string(it) = {
+  if type(it) == str {
+    it
+  } else if type(it) != content {
+    str(it)
+  } else if it.has("text") {
+    it.text
+  } else if it.has("children") {
+    it.children.map(_to-string).join()
+  } else if it.has("body") {
+    _to-string(it.body)
+  } else if it == [ ] {
+    " "
+  } else {
+    panic("invalid value")
+  }
+}
 
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
   /// Formats a float with thousands separator.
@@ -122,7 +142,6 @@
   let exponent-matches = unit-str.matches(_exponent-pattern)
   let exponent = ""
   for match in exponent-matches {
-
     exponent = "^" + match.text
     for (unicode, ascii) in _unicode-exponents {
       exponent = exponent.replace(regex(unicode), ascii)
@@ -295,6 +314,8 @@
   /// - `per`: Whether to format the units after `per` with a fraction or exponent.
 
   assert(("symbol", "fraction", "/", "fraction-short", "short-fraction", "\\/").contains(per))
+
+  string = _to-string(string)
 
   // load data
   let (units, units-short, units-space, units-short-space) = _units()
@@ -491,9 +512,16 @@
     }
     formatted-value += "10^(" + str(exponent-lower) + ")"
   }
-  formatted-value += space + " " + delimiter + " " + space + _format-num(upper, thousandsep: thousandsep).replace(
-    ",",
-    ",#h(0pt)",
+  formatted-value += (
+    space
+      + " "
+      + delimiter
+      + " "
+      + space
+      + _format-num(upper, thousandsep: thousandsep).replace(
+        ",",
+        ",#h(0pt)",
+      )
   )
   if exponent-lower != exponent-upper and exponent-upper != none {
     if upper != none {
