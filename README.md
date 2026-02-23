@@ -33,7 +33,7 @@ Parentheses are automatically set as necessary. Use `thousandsep` to change the 
 
 
 ## `unit`
-`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), `fraction` or `/` using fraction, and `fraction-short` or `\\/` using in-line fractions.  
+`unit` takes the unit in words or in symbolic notation as its first argument. The value of `space` will be inserted between units if necessary, and the value of `num-unit-space` between the number and the unit. Setting `per` to `symbol` will format the number with exponents (i.e. `^(-1)`), `fraction` or `/` using fraction, and `fraction-short` or `\\/` using in-line fractions.  
 Units in words have four possible parts:
 - `per` forms the inverse of the following unit.
 - A written-out prefix in the sense of SI (e.g. `centi`). This is added before the unit.
@@ -73,4 +73,4 @@ If you think there are units not included that are of interest for other users, 
 
 
 ## `qtyrange`
-`qtyrange` is just a combination of `unit` and `range`.
+`qtyrange` is just a combination of `unit` and `range`. `space` is inserted between the numbers and the delimiter (equivalently to `numrange`), `unitspace` between the units (equivalently to `space` in `unit` and `qty`), and range-unit-space between the range/exponential and the units.
