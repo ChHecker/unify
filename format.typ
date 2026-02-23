@@ -41,9 +41,11 @@
 
   string += str(int-list.remove(0))
   for (i, n) in int-list.enumerate() {
-    let mod = (i - int-list.len()) / 3
-    if int(mod) == mod {
-      string += " " + thousandsep + " "
+    if int-list.len() > 4 {
+      let mod = (i - int-list.len()) / 3
+      if int(mod) == mod {
+        string += " " + thousandsep + " "
+      }
     }
     string += str(n)
   }
@@ -52,9 +54,11 @@
     let dec-list = dec-part.clusters()
     string += decsep
     for (i, n) in dec-list.enumerate() {
-      let mod = i / 3
-      if int(mod) == mod and i != 0 {
-        string += " " + thousandsep + " "
+      if dec-list.len() > 4 {
+        let mod = i / 3
+        if int(mod) == mod and i != 0 {
+          string += " " + thousandsep + " "
+        }
       }
       string += str(n)
     }
