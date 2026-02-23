@@ -80,7 +80,7 @@
 
   context {
     let formatted-unit = ""
-    formatted-unit = _format-unit(unit, space: space, first-space: false, per: per)
+    formatted-unit = _format-unit(unit, space: space, first-space: "", per: per)
 
     let formatted = "$" + formatted-unit + "$"
     eval(formatted)
@@ -92,6 +92,7 @@
   unit,
   rawunit: false,
   space: "#h(0.166667em)",
+  num-unit-space: "#h(0.166667em)",
   multiplier: "dot",
   thousandsep: "#h(0.166667em)",
   per: "symbol",
@@ -102,6 +103,7 @@
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `rawunit`: Whether to transform the unit or keep the raw string.
   /// - `space`: Space between units.
+  /// - `num-unit-space`: Space between the number and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
@@ -134,7 +136,7 @@
     if rawunit {
       formatted-unit = space + unit
     } else {
-      formatted-unit = _format-unit(unit, space: space, per: per)
+      formatted-unit = _format-unit(unit, space: space, first-space: num-unit-space, per: per)
     }
 
     let formatted = "$" + formatted-value + formatted-unit + "$"
@@ -190,6 +192,7 @@
   delimiter: "-",
   space: "",
   unitspace: "#h(0.16667em)",
+  range-unit-space: "#h(0.166667em)",
   thousandsep: "#h(0.166667em)",
   per: "symbol",
 ) = {
@@ -201,6 +204,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `unitspace`: Space between units.
+  /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
@@ -231,7 +235,7 @@
     if rawunit {
       formatted-unit = space + unit
     } else {
-      formatted-unit = _format-unit(unit, space: unitspace, per: per)
+      formatted-unit = _format-unit(unit, space: unitspace, first-space: range-unit-space, per: per)
     }
 
     let formatted = "$" + formatted-value + formatted-unit + "$"

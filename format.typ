@@ -151,7 +151,97 @@
   unit-str
 }
 
-#let _chunk(string, cond) = (string: string, cond: cond)
+#let _unit(symbol, exponent, space) = (symbol: symbol, exponent: exponent, space: space)
+
+#let _format-unit-from-lists(normal-list, per-list, per, space, first-space) = {
+  let formatted = ""
+
+  if (
+    (normal-list.len() > 0 and normal-list.at(0).at("space")) or (normal-list.len() == 0 and per-list.at(0).at("space"))
+  ) {
+    formatted += first-space
+  }
+
+  if per == "symbol" {
+    for (i, chunk) in normal-list.enumerate() {
+      let (symbol: n, exponent: exponent, space: space-set) = chunk
+      if i != 0 and space-set {
+        formatted += space
+      }
+      formatted += n
+      if exponent != none {
+        formatted += "^(" + exponent + ")"
+      }
+    }
+
+    for (i, chunk) in per-list.enumerate() {
+      let (symbol: p, exponent: exponent, space: space-set) = chunk
+      if space-set and (i != 0 or normal-list.len() != 0) {
+        formatted += space
+      }
+      formatted += p + "^(-"
+      if exponent != none {
+        formatted += exponent
+      } else {
+        formatted += "1"
+      }
+      formatted += ")"
+    }
+  } else if per == "fraction" or per == "/" {
+    if per-list.len() > 0 {
+      formatted += " ("
+    }
+
+    for (i, chunk) in normal-list.enumerate() {
+      let (symbol: n, exponent: exponent, space: space-set) = chunk
+      if i != 0 and space-set {
+        formatted += space
+      }
+      formatted += n
+      if exponent != none {
+        formatted += "^(" + exponent + ")"
+      }
+    }
+
+    if per-list.len() == 0 {
+      return formatted
+    }
+
+    formatted += ")/("
+    for (i, chunk) in per-list.enumerate() {
+      let (symbol: p, exponent: exponent, space: space-set) = chunk
+      if i != 0 and space-set {
+        formatted += space
+      }
+      formatted += p
+      if exponent != none {
+        formatted += "^(" + exponent + ")"
+      }
+    }
+    formatted += ")"
+  } else if per == "fraction-short" or per == "\\/" {
+    for (i, chunk) in normal-list.enumerate() {
+      let (symbol: n, exponent: exponent, space: space-set) = chunk
+      if i != 0 and space-set {
+        formatted += space
+      }
+      formatted += n
+      if exponent != none {
+        formatted += "^(" + exponent + ")"
+      }
+    }
+
+    for (i, chunk) in per-list.enumerate() {
+      let (symbol: p, exponent: exponent, space: space-set) = chunk
+      formatted += "\\/" + p
+      if exponent != none {
+        formatted += "^(" + exponent + ")"
+      }
+    }
+  }
+
+  formatted
+}
 
 #let _format-unit-short(
   string,
@@ -159,7 +249,7 @@
   units-short-space,
   prefixes-short,
   space: "#h(0.166667em)",
-  first-space: true,
+  first-space: "#h(0.166667em)",
   per: "symbol",
 ) = {
   /// Format a unit using the shorthand notation.
@@ -177,141 +267,59 @@
   let chunks = ()
   for s in split {
     let per-split = s.split("/")
-    chunks.push(_chunk(per-split.at(0), false))
-    if per-split.len() > 1 {
-      for p in per-split.slice(1) {
-        chunks.push(_chunk(p, true))
-      }
+    for (i, p) in per-split.enumerate() {
+      let per-set = i != 0
+      let exp-split = p.split("^")
+      let exp = exp-split.at(1, default: none)
+      chunks.push(_unit(exp-split.at(0), exp, per-set))
     }
   }
 
   // needed for fraction formatting
   let normal-list = ()
   let per-list = ()
-  let first-unit = true
 
   let prefixes = ()
-  for (string: string, cond: per-set) in chunks {
+  for (symbol: symbol, exponent: exponent, space: per-set) in chunks {
     let u-space = true
     let prefix = none
     let unit = ""
-    let exponent = none
 
-    let qty-exp = string.split("^")
-    let quantity = qty-exp.at(0)
-    exponent = qty-exp.at(1, default: none)
-
-    if quantity in units-short {
+    if symbol in units-short {
       // Match units without prefixes
-      unit = units-short.at(quantity)
-      u-space = units-short-space.at(quantity) and (first-space or not first-unit)
-      first-unit = false
+      unit = units-short.at(symbol)
+      u-space = units-short-space.at(symbol)
     } else {
       // Match prefix + unit
       let pre = ""
-      for char in quantity.clusters() {
+      for char in symbol.clusters() {
         pre += char
-        // Divide `quantity` into `pre`+`u` and check validity
+        // Divide `symbol` into `pre`+`u` and check validity
         if pre in prefixes-short {
-          let u = quantity.trim(pre, at: start, repeat: false)
+          let u = symbol.trim(pre, at: start, repeat: false)
           if u in units-short {
             prefix = prefixes-short.at(pre)
             unit = units-short.at(u)
-            u-space = units-short-space.at(u) and (first-space or not first-unit)
-            first-unit = false
+            u-space = units-short-space.at(u)
 
             pre = none
             break
           }
         }
       }
-      // if pre != none {
-      //   panic("invalid unit: " + quantity)
-      // }
     }
 
-    if per == "symbol" {
-      if u-space {
-        formatted += space
-      }
-      formatted += prefix + unit
-      if exponent != none {
-        if per-set {
-          formatted += "^(-" + exponent + ")"
-        } else {
-          formatted += "^(" + exponent + ")"
-        }
-      } else if per-set {
-        formatted += "^(-1)"
-      }
+    if per-set {
+      per-list.push(_unit(prefix + unit, exponent, u-space))
     } else {
-      let final-unit = ""
-      // if u-space {
-      //   final-unit += space
-      // }
-      final-unit += prefix + unit
-      if exponent != none {
-        final-unit += "^(" + exponent + ")"
-      }
-
-      if per-set {
-        per-list.push(_chunk(final-unit, u-space))
-      } else {
-        normal-list.push(_chunk(final-unit, u-space))
-      }
+      normal-list.push(_unit(prefix + unit, exponent, u-space))
     }
   }
 
-  if per == "fraction" or per == "/" {
-    if normal-list.at(0).at("cond") {
-      formatted += space
-    }
-
-    if per-list.len() > 0 {
-      formatted += " ("
-    }
-
-    for (i, chunk) in normal-list.enumerate() {
-      let (string: n, cond: space-set) = chunk
-      if i != 0 and space-set {
-        formatted += space
-      }
-      formatted += n
-    }
-
-    if per-list.len() == 0 {
-      return formatted
-    }
-
-    formatted += ")/("
-    for (i, chunk) in per-list.enumerate() {
-      let (string: p, cond: space-set) = chunk
-      if i != 0 and space-set {
-        formatted += space
-      }
-      formatted += p
-    }
-    formatted += ")"
-  } else if per == "fraction-short" or per == "\\/" {
-    if normal-list.at(0).at("cond") {
-      formatted += space
-    }
-
-    for (i, chunk) in normal-list.enumerate() {
-      let (string: n, cond: space-set) = chunk
-      formatted += n
-    }
-
-    for (i, chunk) in per-list.enumerate() {
-      let (string: p, cond: space-set) = chunk
-      formatted += "\\/" + p
-    }
-  }
-
-  formatted
+  _format-unit-from-lists(normal-list, per-list, per, space, first-space)
 }
 
-#let _format-unit(string, space: "#h(0.166667em)", first-space: true, per: "symbol") = {
+#let _format-unit(string, space: "#h(0.166667em)", first-space: "#h(0.166667em)", per: "symbol") = {
   /// Format a unit using written-out words.
   /// - `string`: String containing the unit.
   /// - `space`: Space between units.
@@ -320,6 +328,8 @@
   assert(("symbol", "fraction", "/", "fraction-short", "short-fraction", "\\/").contains(per))
 
   string = _to-string(string)
+  first-space = " " + first-space + " "
+  space = " " + space + " "
 
   // load data
   let (units, units-short, units-space, units-short-space) = _units()
@@ -336,10 +346,8 @@
   let per-set = false
   // whether waiting for a postfix
   let post = false
-  // whether on first unit
-  let first-unit = true
   // one unit
-  let unit = _chunk("", true)
+  let unit = _unit("", none, false)
 
   let split = lower(string).split(" ")
   split.push("")
@@ -347,80 +355,24 @@
   for u in split {
     // expecting postfix
     if post {
-      if per == "symbol" {
-        // add postfix
-        if u in _postfixes {
-          if per-set {
-            unit.at("string") += "^(-"
-          } else {
-            unit.at("string") += "^("
-          }
-          unit.at("string") += _postfixes.at(u)
-          unit.at("string") += ")"
+      let is_postfix = u in _postfixes
+      if is_postfix {
+        unit.at("exponent") = _postfixes.at(u)
+      }
 
-          if unit.at("cond") {
-            unit.at("string") = space + unit.at("string")
-          }
-
-          per-set = false
-          post = false
-
-          formatted += unit.at("string")
-          unit = _chunk("", true)
-          continue
-          // add per
-        } else if per-set {
-          unit.at("string") += "^(-1)"
-
-          if unit.at("cond") {
-            unit.at("string") = space + unit.at("string")
-          }
-
-          per-set = false
-          post = false
-
-          formatted += unit.at("string")
-          unit = _chunk("", true)
-          // finish unit
-        } else {
-          post = false
-
-          if unit.at("cond") {
-            unit.at("string") = space + unit.at("string")
-          }
-
-          formatted += unit.at("string")
-          unit = _chunk("", true)
-        }
+      if per-set {
+        per-list.push(unit)
       } else {
-        if u in _postfixes {
-          unit.at("string") += "^("
-          unit.at("string") += _postfixes.at(u)
-          unit.at("string") += ")"
+        normal-list.push(unit)
+      }
 
-          if per-set {
-            per-list.push(unit)
-          } else {
-            normal-list.push(unit)
-          }
+      per-set = false
+      post = false
 
-          per-set = false
-          post = false
+      unit = _unit("", none, false)
 
-          unit = _chunk("", true)
-          continue
-        } else {
-          if per-set {
-            per-list.push(unit)
-          } else {
-            normal-list.push(unit)
-          }
-
-          per-set = false
-          post = false
-
-          unit = _chunk("", true)
-        }
+      if is_postfix {
+        continue
       }
     }
 
@@ -429,13 +381,11 @@
       per-set = true
       // add prefix
     } else if u in prefixes {
-      unit.at("string") += prefixes.at(u)
+      unit.at("symbol") += prefixes.at(u)
       // add unit
     } else if u in units {
-      unit.at("string") += units.at(u)
-      // if first-unit and not first-space then no space else units-space.at(u)
-      unit.at("cond") = units-space.at(u) and (first-space or not first-unit)
-      first-unit = false
+      unit.at("symbol") += units.at(u)
+      unit.at("space") = units-space.at(u)
       post = true
     } else if u != "" {
       return _format-unit-short(
@@ -450,53 +400,7 @@
     }
   }
 
-  if per == "fraction" or per == "/" {
-    if normal-list.at(0).at("cond") {
-      formatted += space
-    }
-
-    if per-list.len() > 0 {
-      formatted += " ("
-    }
-
-    for (i, chunk) in normal-list.enumerate() {
-      let (string: n, cond: space-set) = chunk
-      if i != 0 and space-set {
-        formatted += space
-      }
-      formatted += n
-    }
-
-    if per-list.len() == 0 {
-      return formatted
-    }
-
-    formatted += ")/("
-    for (i, chunk) in per-list.enumerate() {
-      let (string: p, cond: space-set) = chunk
-      if i != 0 and space-set {
-        formatted += space
-      }
-      formatted += p
-    }
-    formatted += ")"
-  } else if per == "fraction-short" or per == "\\/" {
-    if normal-list.at(0).at("cond") {
-      formatted += space
-    }
-
-    for (i, chunk) in normal-list.enumerate() {
-      let (string: n, cond: space-set) = chunk
-      formatted += n
-    }
-
-    for (i, chunk) in per-list.enumerate() {
-      let (string: p, cond: space-set) = chunk
-      formatted += "\\/" + p
-    }
-  }
-
-  formatted
+  _format-unit-from-lists(normal-list, per-list, per, space, first-space)
 }
 
 #let _format-range(
@@ -519,6 +423,7 @@
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `force-parentheses`: Whether to force parentheses around the range.
 
+  space = " " + space + " "
   let formatted-value = ""
 
   formatted-value += _format-num(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
