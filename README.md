@@ -23,7 +23,7 @@ The Unify package supports multiple languages. Currently, the supported language
 `num` uses string parsing in order to typeset numbers, including separators between the thousands. They can have the following form:
 - `float` or `integer` number
 - either (`{}` stands for a number)
-    - symmetric uncertainties with `+-{}`
+    - symmetric uncertainties with `+-{}` or `±{}`
     - asymmetric uncertainties with `+{}-{}`
 - exponential notation `e{}`
 
