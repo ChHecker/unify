@@ -25,7 +25,7 @@
 
   let formatted = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(18),
+    exponent: captures-value.at(19),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -124,7 +124,7 @@
 
   let formatted-value = _format-num(
     captures-value.at(0),
-    exponent: captures-value.at(18),
+    exponent: captures-value.at(19),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -171,8 +171,8 @@
   let formatted = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(18),
-    exponent-upper: captures-upper.at(18),
+    exponent-lower: captures-lower.at(19),
+    exponent-upper: captures-upper.at(19),
     multiplier: multiplier,
     delimiter: delimiter,
     thousandsep: thousandsep,
@@ -221,8 +221,8 @@
   let formatted-value = _format-range(
     captures-lower.at(0),
     captures-upper.at(0),
-    exponent-lower: captures-lower.at(18),
-    exponent-upper: captures-upper.at(18),
+    exponent-lower: captures-lower.at(19),
+    exponent-upper: captures-upper.at(19),
     multiplier: multiplier,
     delimiter: delimiter,
     space: space,
