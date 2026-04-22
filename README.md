@@ -12,7 +12,7 @@ $ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
 $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
 $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
 ```
-<img src="examples/overview.jpg" width="300">
+<img src="examples/overview.jpg" width="300" alt="Example of unify rendering scientific notation with uncertainties and units using custom spacing, thousands separators, and delimiters.">
 
 Right now, physical, monetary, and binary units are supported. New issues or pull requests for new units are welcome!
 
