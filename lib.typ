@@ -15,8 +15,8 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(14) != none {
-    upper = captures-value.at(14)
+  if captures-value.at(15) != none {
+    upper = captures-value.at(15)
     lower = none
   } else {
     upper = captures-value.at(5)
@@ -114,8 +114,8 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(14) != none {
-    upper = captures-value.at(14)
+  if captures-value.at(15) != none {
+    upper = captures-value.at(15)
     lower = none
   } else {
     upper = captures-value.at(5)
