@@ -1,4 +1,4 @@
-#import "../lib.typ": *
+#import "@local/unify:0.8.1": *
 
 #set text(lang: "en")
 Working with English characters:
