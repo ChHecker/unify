@@ -15,21 +15,31 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
+  let num = none
+  let concise-symmetric = captures-value.at(1) != none
+  if concise-symmetric {
+    num = captures-value.at(2)
+    upper = captures-value.at(4)
     lower = none
   } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
+    num = captures-value.at(5)
+    if captures-value.at(18) != none {
+      upper = captures-value.at(18)
+      lower = none
+    } else {
+      upper = captures-value.at(9)
+      lower = captures-value.at(11)
+    }
   }
 
   let formatted = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
+    num,
+    exponent: captures-value.at(22),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
     thousandsep: thousandsep,
+    concise-symmetric: concise-symmetric,
   )
 
   formatted = "$" + formatted + "$"
@@ -114,21 +124,31 @@
 
   let upper = none
   let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
+  let num = none
+  let concise-symmetric = captures-value.at(1) != none
+  if concise-symmetric {
+    num = captures-value.at(2)
+    upper = captures-value.at(4)
     lower = none
   } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
+    num = captures-value.at(5)
+    if captures-value.at(18) != none {
+      upper = captures-value.at(18)
+      lower = none
+    } else {
+      upper = captures-value.at(9)
+      lower = captures-value.at(11)
+    }
   }
 
   let formatted-value = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
+    num,
+    exponent: captures-value.at(22),
     upper: upper,
     lower: lower,
     multiplier: multiplier,
     thousandsep: thousandsep,
+    concise-symmetric: concise-symmetric,
   )
 
   context {

@@ -1,7 +1,7 @@
 #import "init.typ": *
 
 #let _re-num = regex(
-  "^(-?\d+(\.|,)?\d*)?(((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*)))|((((\+-)|(-\+)|(\u00B1))(\d+(\.|,)?\d*))))?((e|E)([-\+]?\d+))?$",
+  "^(((-?\d+(\.|,)?\d*)\((\d+)\))|(-?\d+(\.|,)?\d*)?((\+(\d+(\.|,)?\d*)-(\d+(\.|,)?\d*))|(((\+-)|(-\+)|(\u00B1))(\d+(\.|,)?\d*)))?)?((e|E)([-\+]?\d+))?$",
 )
 
 #let _unicode-exponents = (
@@ -95,6 +95,7 @@
   lower: none,
   multiplier: "dot",
   thousandsep: "#h(0.166667em)",
+  concise-symmetric: false,
 ) = {
   /// Format a number.
   /// - `value`: Value of the number.
@@ -103,6 +104,7 @@
   /// - `lower`: Lower uncertainty.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `concise-symmetric`: Whether to use concise parentheses notation for symmetric uncertainty.
 
   let formatted-value = ""
   if value != none {
@@ -113,14 +115,26 @@
       formatted-value += "^(+" + _format-float(upper, thousandsep: thousandsep) + ")"
       formatted-value += "_(-" + _format-float(lower, thousandsep: thousandsep) + ")"
     } else {
-      formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+      if concise-symmetric {
+        formatted-value += "(" + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)") + ")"
+      } else {
+        formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+      }
     }
   } else if upper != none {
-    formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+    if concise-symmetric {
+      formatted-value += "(" + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)") + ")"
+    } else {
+      formatted-value += " plus.minus " + _format-float(upper, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+    }
   } else if lower != none {
-    formatted-value += " plus.minus " + _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+    if concise-symmetric {
+      formatted-value += "(" + _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)") + ")"
+    } else {
+      formatted-value += " plus.minus " + _format-float(lower, thousandsep: thousandsep).replace(",", ",#h(0pt)")
+    }
   }
-  if not (upper == none and lower == none) {
+  if not (upper == none and lower == none) and not concise-symmetric {
     formatted-value = "lr((" + formatted-value
     formatted-value += "))"
   }
