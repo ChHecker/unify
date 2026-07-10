@@ -38,7 +38,7 @@ Units in words have four possible parts:
 - `per` forms the inverse of the following unit.
 - A written-out prefix in the sense of SI (e.g. `centi`). This is added before the unit.
 - The unit itself written out (e.g. `gram`).
-- A postfix like `squared`. This is added after the unit and takes `per` into account.
+- A postfix like `squared`. This is added after the unit and takes `per` into account. Postfixes registered with `add-postfix` are instead appended to the unit symbol verbatim (see below).
 
 The shorthand notation also has four parts:
 - `/` forms the inverse of the following unit.
@@ -48,11 +48,13 @@ The shorthand notation also has four parts:
 
 Note: Use `u` for micro.
 
-The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). Your own units etc. can be permanently added in these files. At runtime, they can be added using `add-unit` and `add-prefix`, respectively. The formats for the pre- and postfixes are:
+The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). Your own units etc. can be permanently added in these files. At runtime, they can be added using `add-unit`, `add-prefix`, and `add-postfix`, respectively. The formats for the pre- and postfixes are:
 
 | pre-/postfix | shorthand | symbol       |
 | ------------ | --------- | ------------ |
 | milli        | m         | upright("m") |
+
+Note that the built-in postfixes in `postfixes.csv` (e.g. `squared`) are a special case: their symbol is a numeric exponent that is rendered as such and honours `per`. Postfixes added with `add-postfix` append their `symbol` to the unit symbol verbatim, e.g. `#add-postfix("gf12", "gf12", "_(upright(\"GF12\"))")` renders `qty(1, "gate-equivalent gf12")` with a `GF12` subscript.
 
 and for units:
 

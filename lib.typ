@@ -71,6 +71,21 @@
   }
 }
 
+#let add-postfix(postfix, shorthand, symbol) = {
+  /// Add a new postfix.
+  /// - `postfix`: Full name of the postfix.
+  /// - `shorthand`: Shorthand of the postfix, usually only 1-2 letters.
+  /// - `symbol`: String that will be appended to the unit symbol.
+  context {
+    let lang = _get-language()
+
+    _lang-db.update(db => {
+      db.at(lang).at("postfixes").at(0).insert(postfix, symbol)
+      db.at(lang).at("postfixes").at(1).insert(shorthand, symbol)
+      db
+    })
+  }
+}
 
 #let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
   /// Format a unit.
