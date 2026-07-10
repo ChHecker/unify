@@ -13,6 +13,10 @@ Adding your own prefix and unit:
 #add-unit("unit", "U", "bold(\"unit\")")
 $ unit("PU") $
 
+Adding your own postfix (appended to the unit symbol):
+#add-postfix("post", "po", "_(upright(\"post\"))")
+$ qty(1, "meter post") $
+
 #set text(lang: "ru")
 Работа пакета с русскими символами:
 $ num("-1.32865+-0.50273e-6") $

@@ -54,6 +54,10 @@
   (units, units-short, units-space, units-short-space)
 }
 
+// Built-in numeric postfixes (e.g. `squared` -> `2`). These render as
+// exponents and honour `per`. User-defined postfixes added via `add-postfix`
+// are kept separately in the language database (see `_postfixes-db`) and are
+// appended to the unit symbol verbatim.
 #let _postfixes = _postfix-csv("postfixes.csv")
 
 #let _add-money-units(data) = {
@@ -81,10 +85,12 @@
     "en": (
       "units": (_add-money-units(_unit-csv("units-en.csv"))),
       "prefixes": (_prefix-csv("prefixes-en.csv")),
+      "postfixes": ((:), (:)),
     ),
     "ru": (
       "units": (_add-money-units(_unit-csv("units-ru.csv"))),
       "prefixes": (_prefix-csv("prefixes-ru.csv")),
+      "postfixes": ((:), (:)),
     ),
   ),
 )
@@ -119,5 +125,16 @@
     data.at(lang).units
   } else {
     data.en.units
+  }
+}
+
+// get postfixes
+#let _postfixes-db() = {
+  let lang = text.lang
+  let data = _lang-db.get()
+  if lang in data {
+    data.at(lang).postfixes
+  } else {
+    data.en.postfixes
   }
 }

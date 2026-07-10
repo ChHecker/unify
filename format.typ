@@ -337,6 +337,8 @@
 
   let (prefixes, prefixes-short) = _prefixes()
 
+  let (postfixes, postfixes-short) = _postfixes-db()
+
   let formatted = ""
 
   // needed for fraction formatting
@@ -356,9 +358,14 @@
   for u in split {
     // expecting postfix
     if post {
-      let is_postfix = u in _postfixes
-      if is_postfix {
+      // Built-in numeric postfixes (e.g. `squared`) render as exponents,
+      // user-defined ones (see `add-postfix`) are appended to the symbol.
+      let is_exponent = u in _postfixes
+      let is_postfix = u in postfixes
+      if is_exponent {
         unit.at("exponent") = _postfixes.at(u)
+      } else if is_postfix {
+        unit.at("symbol") += postfixes.at(u)
       }
 
       if per-set {
@@ -372,7 +379,7 @@
 
       unit = _unit("", none, false)
 
-      if is_postfix {
+      if is_exponent or is_postfix {
         continue
       }
     }
