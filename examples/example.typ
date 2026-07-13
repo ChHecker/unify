@@ -8,6 +8,10 @@ $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
 $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"", range-unit-space: "#h(3mm)") $
 $ qty("55.36", "usd") $
 
+Rendering in the document font with `mode: "text"`:
+
+The speed of light is #qty("2.99792458e8", "m/s", mode: "text"), *even in bold: #qty("2.99792458e8", "m/s", mode: "text")*, compared to math mode #qty("2.99792458e8", "m/s").
+
 Adding your own prefix and unit:
 #add-prefix("pre", "P", "upright(\"pre\")")
 #add-unit("unit", "U", "bold(\"unit\")")
