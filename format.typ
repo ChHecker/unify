@@ -37,6 +37,24 @@
   }
 }
 
+#let _display-math(formatted, mode) = {
+  /// Evaluate a formatted math string and display it.
+  /// - `formatted`: Math string to evaluate (without the surrounding `$`).
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
+  assert(("math", "text").contains(mode), message: "invalid mode: " + mode)
+
+  if mode == "math" {
+    eval("$" + formatted + "$")
+  } else {
+    context {
+      // Change the font of the glyphs (`math.text`) but keep the math font
+      // for layout so that scripts, fractions, and delimiters are positioned correctly.
+      show math.text: set text(font: text.font, weight: text.weight)
+      eval("$" + formatted + "$")
+    }
+  }
+}
+
 #let _format-float(f, decsep: "auto", thousandsep: "#h(0.166667em)") = {
   /// Formats a float with thousands separator.
   /// - `f`: Float to format.

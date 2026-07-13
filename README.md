@@ -16,6 +16,16 @@ $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\
 
 Right now, physical, monetary, and binary units are supported. New issues or pull requests for new units are welcome!
 
+## Math and text mode
+By default, all output is rendered as math and therefore uses the math font. If you prefer numbers and units to match the surrounding document font (like `mode = text` in `siunitx`), set `mode: "text"`:
+```typ
+The speed of light is #qty("2.99792458e8", "m/s", mode: "text").
+```
+In text mode, the glyphs are rendered in the current document font and weight (so it also works in bold headings), while the math font is still used for layout so that exponents, fractions, and parentheses are positioned correctly. The parameter is available on `num`, `unit`, `qty`, `numrange`, and `qtyrange`. To enable it globally, you can override the functions once at the top of your document:
+```typ
+#let qty = qty.with(mode: "text")
+```
+
 ## Multilingual support 
 The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`, and in the `lib.typ` file you should fix the `lang-db` state for your files.
 

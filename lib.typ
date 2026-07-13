@@ -1,10 +1,11 @@
 #import "format.typ": *
 
-#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)") = {
+#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)", mode: "math") = {
   /// Format a number.
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   // str() converts minus "-" of a number to unicode "\u2212"
   value = _to-string(value).replace("−", "-").replace(" ", "") //.replace(",", ".")
@@ -32,8 +33,7 @@
     thousandsep: thousandsep,
   )
 
-  formatted = "$" + formatted + "$"
-  eval(formatted)
+  _display-math(formatted, mode)
 }
 
 #let add-unit(unit, shorthand, symbol, space: true) = {
@@ -72,18 +72,18 @@
 }
 
 
-#let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
+#let unit(unit, space: "#h(0.166667em)", per: "symbol", mode: "math") = {
   /// Format a unit.
   /// - `unit`: String containing the unit.
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   context {
     let formatted-unit = ""
     formatted-unit = _format-unit(unit, space: space, first-space: "", per: per)
 
-    let formatted = "$" + formatted-unit + "$"
-    eval(formatted)
+    _display-math(formatted-unit, mode)
   }
 }
 
@@ -96,6 +96,7 @@
   multiplier: "dot",
   thousandsep: "#h(0.166667em)",
   per: "symbol",
+  mode: "math",
 ) = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
@@ -106,6 +107,7 @@
   /// - `num-unit-space`: Space between the number and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
   let match-value = value.match(_re-num)
@@ -139,8 +141,7 @@
       formatted-unit = _format-unit(unit, space: space, first-space: num-unit-space, per: per)
     }
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    _display-math(formatted-value + formatted-unit, mode)
   }
 }
 
@@ -151,6 +152,7 @@
   delimiter: "-",
   space: "#h(0.16667em)",
   thousandsep: "#h(0.166667em)",
+  mode: "math",
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -158,6 +160,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   let match-lower = lower.match(_re-num)
   assert.ne(match-lower, none, message: "invalid lower number: " + lower)
@@ -178,9 +181,8 @@
     thousandsep: thousandsep,
     space: space,
   )
-  formatted = "$" + formatted + "$"
 
-  eval(formatted)
+  _display-math(formatted, mode)
 }
 
 #let qtyrange(
@@ -195,6 +197,7 @@
   range-unit-space: "#h(0.166667em)",
   thousandsep: "#h(0.166667em)",
   per: "symbol",
+  mode: "math",
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -207,6 +210,7 @@
   /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   let match-lower = lower.match(_re-num)
@@ -238,7 +242,6 @@
       formatted-unit = _format-unit(unit, space: unitspace, first-space: range-unit-space, per: per)
     }
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    _display-math(formatted-value + formatted-unit, mode)
   }
 }
