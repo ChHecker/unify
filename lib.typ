@@ -1,4 +1,5 @@
 #import "format.typ": *
+#import "alt-text.typ": *
 
 #let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)") = {
   /// Format a number.
@@ -23,9 +24,12 @@
     lower = captures-value.at(7)
   }
 
+  let value = captures-value.at(0)
+  let exponent = captures-value.at(19)
+
   let formatted = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
+    value,
+    exponent: exponent,
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -33,7 +37,19 @@
   )
 
   formatted = "$" + formatted + "$"
-  eval(formatted)
+
+  context {
+    let alt-text = if enable-alt-text.get() {
+      _create-alt-text-for-number(
+        value,
+        upper: upper,
+        lower: lower,
+        exponent: exponent,
+      )
+    }
+
+    math.equation(eval(formatted), alt: alt-text)
+  }
 }
 
 #let add-unit(unit, shorthand, symbol, space: true) = {
@@ -83,7 +99,12 @@
     formatted-unit = _format-unit(unit, space: space, first-space: "", per: per)
 
     let formatted = "$" + formatted-unit + "$"
-    eval(formatted)
+    let alt-text = if enable-alt-text.get() { unit }
+
+    math.equation(
+      eval(formatted),
+      alt: alt-text,
+    )
   }
 }
 
@@ -122,9 +143,12 @@
     lower = captures-value.at(7)
   }
 
+  let value = captures-value.at(0)
+  let exponent = captures-value.at(19)
+
   let formatted-value = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
+    value,
+    exponent: exponent,
     upper: upper,
     lower: lower,
     multiplier: multiplier,
@@ -140,7 +164,25 @@
     }
 
     let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+
+
+    let alt-text = if enable-alt-text.get() {
+      (
+        _create-alt-text-for-number(
+          value,
+          upper: upper,
+          lower: lower,
+          exponent: exponent,
+        )
+          + " "
+          + unit
+      )
+    }
+
+    math.equation(
+      eval(formatted),
+      alt: alt-text,
+    )
   }
 }
 
@@ -168,11 +210,16 @@
   assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
 
+  let value-lower = captures-lower.at(0)
+  let value-upper = captures-upper.at(0)
+  let exponent-lower = captures-lower.at(19)
+  let exponent-upper = captures-upper.at(19)
+
   let formatted = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
+    value-lower,
+    value-upper,
+    exponent-lower: exponent-lower,
+    exponent-upper: exponent-upper,
     multiplier: multiplier,
     delimiter: delimiter,
     thousandsep: thousandsep,
@@ -180,7 +227,22 @@
   )
   formatted = "$" + formatted + "$"
 
-  eval(formatted)
+  context {
+    let alt-text = if enable-alt-text.get() {
+      (
+        _create-alt-text-for-number(value-lower, exponent: exponent-lower)
+          + " "
+          + _get-text("to")
+          + " "
+          + _create-alt-text-for-number(value-upper, exponent: exponent-upper)
+      )
+    }
+
+    math.equation(
+      eval(formatted),
+      alt: alt-text,
+    )
+  }
 }
 
 #let qtyrange(
@@ -218,11 +280,16 @@
   assert.ne(match-upper, none, message: "invalid upper number: " + upper)
   let captures-upper = match-upper.captures
 
+  let value-lower = captures-lower.at(0)
+  let value-upper = captures-upper.at(0)
+  let exponent-lower = captures-lower.at(19)
+  let exponent-upper = captures-upper.at(19)
+
   let formatted-value = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
+    value-lower,
+    value-upper,
+    exponent-lower: exponent-lower,
+    exponent-upper: exponent-upper,
     multiplier: multiplier,
     delimiter: delimiter,
     space: space,
@@ -239,6 +306,22 @@
     }
 
     let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+
+    let alt-text = if enable-alt-text.get() {
+      (
+        _create-alt-text-for-number(value-lower, exponent: exponent-lower)
+          + " "
+          + _get-text("to")
+          + " "
+          + _create-alt-text-for-number(value-upper, exponent: exponent-upper)
+          + " "
+          + unit
+      )
+    }
+
+    math.equation(
+      eval(formatted),
+      alt: alt-text,
+    )
   }
 }
