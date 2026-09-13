@@ -10,7 +10,9 @@
   value = _to-string(value).replace("−", "-").replace(" ", "") //.replace(",", ".")
 
   let match-value = value.match(_re-num)
-  assert.ne(match-value, none, message: "invalid number: " + value)
+  if match-value == none {
+    panic("invalid number: " + value)
+  }
   let captures-value = match-value.captures
 
   let upper = none
@@ -109,7 +111,9 @@
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
   let match-value = value.match(_re-num)
-  assert.ne(match-value, none, message: "invalid number: " + value)
+  if match-value == none {
+    panic("invalid number: " + value)
+  }
   let captures-value = match-value.captures
 
   let upper = none

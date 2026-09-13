@@ -310,6 +310,10 @@
       }
     }
 
+    if unit == "" {
+      panic("invalid unit: " + symbol)
+    }
+
     if per-set {
       per-list.push(_unit(prefix + unit, exponent, u-space))
     } else {
@@ -353,7 +357,13 @@
   let split = lower(string).split(" ")
   split.push("")
 
-  for u in split {
+  let has_prefix = false
+
+  for (i, u) in split.enumerate() {
+    if u == "" {
+      continue
+    }
+
     // expecting postfix
     if post {
       let is_postfix = u in _postfixes
@@ -371,6 +381,7 @@
       post = false
 
       unit = _unit("", none, false)
+      has_prefix = false
 
       if is_postfix {
         continue
@@ -382,13 +393,18 @@
       per-set = true
       // add prefix
     } else if u in prefixes {
+      if has_prefix {
+        panic("double prefix")
+      }
+
+      has_prefix = true
       unit.at("symbol") += prefixes.at(u)
       // add unit
     } else if u in units {
       unit.at("symbol") += units.at(u)
       unit.at("space") = units-space.at(u)
       post = true
-    } else if u != "" {
+    } else if u != "" and i == 0 {
       return _format-unit-short(
         string,
         units-short,
@@ -398,7 +414,13 @@
         per: per,
         first-space: first-space,
       )
+    } else {
+      panic("invalid unit: " + u)
     }
+  }
+
+  if has_prefix {
+    panic("prefix without unit")
   }
 
   _format-unit-from-lists(normal-list, per-list, per, space, first-space)
