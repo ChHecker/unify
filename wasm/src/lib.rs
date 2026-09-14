@@ -6,6 +6,7 @@ use crate::num::parser::Num;
 use crate::num::{ToTypst as _, TypstNum};
 use crate::numrange::{NumRange, ToTypst as _, TypstNumRange};
 use crate::qty::TypstQty;
+use crate::qtyrange::{QtyRange, ToTypst, TypstQtyRange};
 use crate::unit::long::lexer::Tokenizer as LongUnitTokenizer;
 use crate::unit::parser::Units;
 use crate::unit::short::lexer::Tokenizer as ShortUnitTokenizer;
@@ -14,6 +15,7 @@ use crate::unit::{ToTypst as _, TypstUnit, UnitFmtConf};
 mod num;
 mod numrange;
 mod qty;
+mod qtyrange;
 mod result;
 mod unit;
 pub use result::Result;
@@ -37,7 +39,8 @@ pub fn num(arg: &[u8]) -> crate::Result<Vec<u8>> {
 
 #[wasm_func]
 pub fn numrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
-    let args: TypstNumRange = from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
+    let args: TypstNumRange =
+        from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
 
     let tokenizer_lower = NumTokenizer::new(args.lower.chars());
     let iter_lower = tokenizer_lower.peekable();
@@ -110,4 +113,41 @@ pub fn qty(arg: &[u8]) -> crate::Result<Vec<u8>> {
 
     out.push('$');
     Ok(out.as_bytes().to_vec())
+}
+
+#[wasm_func]
+pub fn qtyrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
+    let args: TypstQtyRange =
+        from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
+
+    let args_range = args.range;
+    let conf_num = args_range.config_num;
+    let conf_range = args_range.config_range;
+
+    let tokenizer_lower = NumTokenizer::new(args_range.lower.chars());
+    let iter_lower = tokenizer_lower.peekable();
+    let tokenizer_upper = NumTokenizer::new(args_range.upper.chars());
+    let iter_upper = tokenizer_upper.peekable();
+    let range = NumRange::new(iter_lower, iter_upper)?;
+
+    let args_unit = args.unit;
+    let conf_unit: UnitFmtConf = args_unit.config.try_into()?;
+
+    let tokenizer = LongUnitTokenizer::new(args_unit.unit.chars());
+    let iter = tokenizer.peekable();
+    let units_long = Units::long(iter, &args_unit.units);
+
+    let units = match units_long {
+        Ok(units) => units,
+        Err(_) => {
+            let tokenizer = ShortUnitTokenizer::new(args_unit.unit.chars());
+            let iter = tokenizer.peekable();
+            Units::short(iter, &args_unit.units)?
+        }
+    };
+
+    let qtyrange = QtyRange { range, unit: units };
+    let qtyrange = qtyrange.to_typst(&conf_num, &conf_range, &conf_unit, &args_unit.units);
+
+    Ok(qtyrange.as_bytes().to_vec())
 }

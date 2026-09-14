@@ -42,16 +42,20 @@
   delimiter: "\"to\"",
   space: "#h(0.3em)",
 )
-#let numrange = (
+#let range = (
   config_num: num-config,
   config_range: range-config,
   lower: "23e6",
   upper: "43e6",
 )
+
 #eval(
   str(
-    unify-rs.numrange(
-      cbor.encode(numrange),
+    unify-rs.qtyrange(
+      cbor.encode((
+        range: range,
+        unit: unit,
+      )),
     ),
   ),
 )
