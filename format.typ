@@ -263,17 +263,40 @@
   let formatted = ""
 
   string = _replace-unicode-exponents(string)
+  string = string.replace(regex(" */ *"), "/").replace(regex(" +"), " ")
 
-  let split = string.replace(regex(" */ *"), "/").replace(regex(" +"), " ").split(regex(" "))
-  let chunks = ()
-  for s in split {
-    let per-split = s.split("/")
-    for (i, p) in per-split.enumerate() {
-      let per-set = i != 0
-      let exp-split = p.split("^")
-      let exp = exp-split.at(1, default: none)
-      chunks.push(_unit(exp-split.at(0), exp, per-set))
+  let paren-depth = 0
+  let split = (("", false),) // the string and whether it's in the denominator
+  for s in string {
+    if s == " " {
+      split.push(("", false))
+    } else if s == "/" {
+      if paren-depth == 0 {
+        split.push(("", true))
+      } else {
+        split.at(-1).at(0) += "\/"
+      }
+    } else if s == "(" {
+      paren-depth += 1
+    } else if s == ")" {
+      if paren-depth == 0 {
+        panic("closing parenthesis without opening")
+      }
+      paren-depth -= 1
+    } else {
+      split.at(-1).at(0) += s
     }
+  }
+
+  if paren-depth != 0 {
+    panic("unclosed parenthesis")
+  }
+
+  let chunks = ()
+  for (s, p) in split {
+    let exp-split = s.split("^")
+    let exp = exp-split.at(1, default: none)
+    chunks.push(_unit(exp-split.at(0), exp, p))
   }
 
   // needed for fraction formatting

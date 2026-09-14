@@ -54,12 +54,12 @@
   (units, units-short, units-space, units-short-space)
 }
 
-#let _postfixes = _postfix-csv("postfixes.csv")
+#let _postfixes = _postfix-csv("units/postfixes.csv")
 
 #let _add-money-units(data) = {
   let (units, units-short, units-space, units-short-space) = data
 
-  let array = csv("money.csv", delimiter: ",")
+  let array = csv("units/money.csv", delimiter: ",")
   for line in array {
     units.insert(lower(line.at(0)), line.at(2))
     units-short.insert(line.at(1), line.at(2))
@@ -79,12 +79,12 @@
   "lang-db",
   (
     "en": (
-      "units": (_add-money-units(_unit-csv("units-en.csv"))),
-      "prefixes": (_prefix-csv("prefixes-en.csv")),
+      "units": (_add-money-units(_unit-csv("units/units-en.csv"))),
+      "prefixes": (_prefix-csv("units/prefixes-en.csv")),
     ),
     "ru": (
-      "units": (_add-money-units(_unit-csv("units-ru.csv"))),
-      "prefixes": (_prefix-csv("prefixes-ru.csv")),
+      "units": (_add-money-units(_unit-csv("units/units-ru.csv"))),
+      "prefixes": (_prefix-csv("units/prefixes-ru.csv")),
     ),
   ),
 )

@@ -1,0 +1,116 @@
+use crate::num::Sign;
+use crate::unit::parser::{Exponent, Unit, Units as PUnits};
+use crate::unit::{PerMode, ToTypst, UnitFmtConf, Units};
+
+impl<'a> ToTypst for PUnits<'a> {
+    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+        if (!self.units_num.is_empty() && self.units_num[0].unit.space)
+            || (self.units_num.is_empty() && self.units_denom[0].unit.space)
+        {
+            buf.push_str(&conf.space_first);
+            buf.push(' ');
+        }
+
+        let mut units_iter = self.units_num.into_iter();
+        if let Some(unit) = units_iter.next() {
+            unit.write_typst(buf, conf, units);
+        }
+        for unit in units_iter {
+            if unit.unit.space {
+                buf.push(' ');
+                buf.push_str(&conf.space);
+                buf.push(' ');
+            }
+            unit.write_typst(buf, conf, units);
+        }
+
+        let space_per = match conf.per_mode {
+            PerMode::Symbol => {
+                buf.push(' ');
+                buf.push_str(&conf.space);
+                buf.push(' ');
+                &conf.space
+            }
+            PerMode::Fraction => {
+                buf.push_str(")/(");
+                &conf.space
+            }
+            PerMode::InlineFraction => {
+                buf.push('/');
+                "/"
+            }
+        };
+
+        let mut units_iter = self.units_denom.into_iter();
+        if let Some(unit) = units_iter.next() {
+            unit.write_typst(buf, conf, units);
+        }
+        for unit in units_iter {
+            if unit.unit.space {
+                buf.push(' ');
+                buf.push_str(space_per);
+                buf.push(' ');
+            }
+            unit.write_typst(buf, conf, units);
+        }
+    }
+}
+
+impl<'a> ToTypst for Unit<'a> {
+    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+        if let Some(prefix) = self.prefix {
+            buf.push_str(prefix);
+        }
+
+        buf.push_str(self.unit.symbol);
+
+        if let Some(exp) = self.exp {
+            exp.write_typst(buf, conf, units);
+        }
+    }
+}
+
+impl ToTypst for Exponent {
+    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, _units: &Units) {
+        buf.push_str("^(");
+
+        if conf.per_mode == PerMode::Symbol && self.sign == Sign::Minus {
+            buf.push('-');
+        }
+
+        buf.push_str(&self.num);
+
+        if let Some(denom) = self.denom {
+            buf.push_str("\\/");
+            buf.push_str(&denom);
+        }
+
+        buf.push(')');
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::unit::short::lexer::Tokenizer;
+
+    use super::*;
+
+    #[test]
+    #[ignore]
+    fn units() {
+        let text = String::from("kg m / s^(2/3) / nb");
+        let tokenizer = Tokenizer::new(text.chars());
+        let mut iter = tokenizer.peekable();
+        let units_lookup = Default::default();
+        let units = PUnits::short(&mut iter, &units_lookup).unwrap();
+
+        let conf = UnitFmtConf {
+            space: String::from(" "),
+            space_first: String::from(""),
+            per_mode: PerMode::Symbol,
+        };
+        let typst = units.to_typst(&conf, &units_lookup);
+
+        dbg!(typst);
+    }
+}

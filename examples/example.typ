@@ -1,9 +1,12 @@
-#import "@local/unify:0.8.1": *
+// #import "@preview/unify:0.8.1": *
+#import "../lib.typ": *
+
+$ qty("1.3+1.2-0.3e3", "erg/cm^(3/2) s^(-1)", space: "dot", num-unit-space: "#h(2mm)") $
 
 #set text(lang: "en")
 Working with English characters:
 $ num("-1.32865+-0.50273e-6") $
-$ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "dot", num-unit-space: "#h(2mm)") $
+$ qty("1.3+1.2-0.3e3", "erg/cm^(3/2)/s", space: "dot", num-unit-space: "#h(2mm)") $
 $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
 $ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"", range-unit-space: "#h(3mm)") $
 $ qty("55.36", "usd") $
