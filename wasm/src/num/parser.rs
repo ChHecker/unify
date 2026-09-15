@@ -35,7 +35,10 @@ pub struct Exponent {
 
 impl Default for Exponent {
     fn default() -> Self {
-        Self { sign: Sign::Plus, int: String::from("1") }
+        Self {
+            sign: Sign::Plus,
+            int: String::from("1"),
+        }
     }
 }
 
@@ -179,10 +182,12 @@ impl Exponent {
         Ok(match iter.peek().transpose()? {
             Some(Token::Exp) => {
                 iter.next();
+
                 let float = Float::new(iter)?;
                 if float.dec.is_some() {
                     return Err(String::from("exponent may not be a decimal"));
                 }
+
                 Some(Self {
                     sign: float.sign,
                     int: float.int,

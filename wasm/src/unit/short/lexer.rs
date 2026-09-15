@@ -29,6 +29,18 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
             '+' => Token::Sign(Sign::Plus),
             '-' => Token::Sign(Sign::Minus),
             '/' => Token::Slash,
+            '\u{2070}' => Token::Exponent('0'),
+            '\u{00B9}' => Token::Exponent('1'),
+            '\u{00B2}' => Token::Exponent('2'),
+            '\u{00B3}' => Token::Exponent('3'),
+            '\u{2074}' => Token::Exponent('4'),
+            '\u{2075}' => Token::Exponent('5'),
+            '\u{2076}' => Token::Exponent('6'),
+            '\u{2077}' => Token::Exponent('7'),
+            '\u{2078}' => Token::Exponent('8'),
+            '\u{2079}' => Token::Exponent('9'),
+            '\u{207A}' => Token::ExponentSign(Sign::Plus),
+            '\u{207B}' => Token::ExponentSign(Sign::Minus),
             c if c.is_numeric() => {
                 let mut num = String::from(c);
                 while let Some(c) = self.iter.peek()
@@ -64,6 +76,8 @@ pub enum Token {
     Unit(String),
     Number(String),
     Sign(Sign),
+    Exponent(char),
+    ExponentSign(Sign),
     Circ,
     ParenOpen,
     ParenClose,

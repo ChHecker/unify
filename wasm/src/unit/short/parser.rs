@@ -76,7 +76,7 @@ impl<'a> Unit<'a> {
         };
 
         let mut exp = match iter.peek().transpose()? {
-            Some(Token::Circ) => {
+            Some(Token::Circ) | Some(Token::Exponent(_)) | Some(Token::ExponentSign(_)) => {
                 iter.next();
                 let exp = Exponent::new(iter)?;
                 Some(exp)
@@ -164,6 +164,37 @@ impl Exponent {
 
                 Self { sign, num, denom }
             }
+            Some(Token::Exponent(exp)) => {
+                let mut num = String::from(exp);
+                while let Some(Token::Exponent(next)) = iter.peek().transpose()? {
+                    let c = char::from_digit(*next as u32, 10).ok_or("invalid exponent")?;
+                    iter.next();
+                    num.push(c);
+                }
+
+                Self {
+                    sign: Sign::Plus,
+                    num,
+                    denom: None,
+                }
+            }
+            Some(Token::ExponentSign(sign)) => {
+                let mut num = String::new();
+                while let Some(Token::Exponent(c)) = iter.peek().transpose()? {
+                    let c = *c;
+                    iter.next();
+                    num.push(c);
+                }
+                if num.is_empty() {
+                    return Err(String::from("exponent sign without number"));
+                }
+
+                Self {
+                    sign,
+                    num,
+                    denom: None,
+                }
+            },
             Some(_) => return Err(String::from("unexpected token in exponent")),
             None => return Err(String::from("invalid exponent")),
         })
@@ -226,6 +257,23 @@ mod tests {
                 sign: Sign::Minus,
                 num: String::from("2"),
                 denom: Some(String::from("3")),
+            })
+        )
+    }
+
+    #[test]
+    fn exponent_unicode() {
+        let text = String::from("\u{207B}\u{00B3}");
+        let tokenizer = Tokenizer::new(text.chars());
+        let mut iter = tokenizer.peekable();
+        let exp = Exponent::new(&mut iter);
+
+        assert_eq!(
+            exp,
+            Ok(Exponent {
+                sign: Sign::Minus,
+                num: String::from("3"),
+                denom: None,
             })
         )
     }
