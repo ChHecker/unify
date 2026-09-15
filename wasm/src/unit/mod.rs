@@ -59,7 +59,7 @@ impl TryFrom<TypstUnitFmtConf> for UnitFmtConf {
 
 #[derive(Debug, Deserialize)]
 pub struct Units {
-    pub lang: Option<String>,
+    pub lang: String,
     pub prefixes: Vec<CustomPrefix>,
     pub units: Vec<CustomUnit>,
     pub postfixes: Vec<CustomPostfix>,
@@ -111,7 +111,7 @@ impl FromStr for PerMode {
 impl Default for Units {
     fn default() -> Self {
         Self {
-            lang: None,
+            lang: String::from("en"),
             prefixes: Default::default(),
             units: Default::default(),
             postfixes: Default::default(),

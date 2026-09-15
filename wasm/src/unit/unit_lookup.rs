@@ -12,9 +12,9 @@ pub struct UnitSpec<'a> {
 
 impl Units {
     fn get_lang(&self) -> &str {
-        match &self.lang {
-            Some(lang) if UNITS.contains_key(lang) => lang,
-            _ => "en",
+        match UNITS.contains_key(&self.lang) {
+            true => &self.lang,
+            false => "en",
         }
     }
 
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn lookup() {
         let units = Units {
-            lang: None,
+            lang: String::from("de"),
             prefixes: vec![],
             units: vec![],
             postfixes: vec![],

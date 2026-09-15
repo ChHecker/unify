@@ -1,6 +1,6 @@
-use crate::num::{NumFmtConf, Sign, ToTypst};
+use crate::Integer;
 use crate::num::parser::{Exponent, Float, Num, Uncertainty};
-use crate::{Integer};
+use crate::num::{NumFmtConf, Sign, ToTypst};
 
 impl ToTypst for Num {
     fn write_typst(self, buf: &mut String, config: &NumFmtConf) {
@@ -107,14 +107,16 @@ fn write_dec(int: Integer, buf: &mut String, config: &NumFmtConf) {
     let len = int.len() / 3;
     let rem = int.len() % 3;
 
-    for i in 0..len - 1 {
-        let range = 3 * i..3 * (i + 1);
-        buf.push_str(&int[range]);
-        buf.push_str(&config.thousand_sep);
-    }
+    if len > 0 {
+        for i in 0..len - 1 {
+            let range = 3 * i..3 * (i + 1);
+            buf.push_str(&int[range]);
+            buf.push_str(&config.thousand_sep);
+        }
 
-    let range = 3 * (len - 1)..3 * len;
-    buf.push_str(&int[range]);
+        let range = 3 * (len - 1)..3 * len;
+        buf.push_str(&int[range]);
+    }
 
     if rem != 0 {
         buf.push_str(&config.thousand_sep);
@@ -126,8 +128,8 @@ fn write_dec(int: Integer, buf: &mut String, config: &NumFmtConf) {
 mod tests {
     use std::borrow::Cow;
 
-    use crate::num::{NumFmtConf, Sign, ToTypst};
     use crate::num::parser::{Exponent, Float, Num, Uncertainty};
+    use crate::num::{NumFmtConf, Sign, ToTypst};
 
     #[test]
     #[ignore]

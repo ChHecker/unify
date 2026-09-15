@@ -11,6 +11,10 @@ impl<'a> ToTypst for PUnits<'a> {
             buf.push(' ');
         }
 
+        if conf.per_mode == PerMode::Fraction {
+            buf.push('(');
+        }
+
         let mut units_iter = self.units_num.into_iter();
         if let Some(unit) = units_iter.next() {
             unit.write_typst(buf, conf, units);
@@ -29,15 +33,15 @@ impl<'a> ToTypst for PUnits<'a> {
                 buf.push(' ');
                 buf.push_str(&conf.space);
                 buf.push(' ');
-                &conf.space
+                format!(" {} ", conf.space)
             }
             PerMode::Fraction => {
                 buf.push_str(")/(");
-                &conf.space
+                format!(" {} ", conf.space)
             }
             PerMode::InlineFraction => {
-                buf.push('/');
-                "/"
+                buf.push_str("\\/");
+                String::from("\\/")
             }
         };
 
@@ -47,11 +51,13 @@ impl<'a> ToTypst for PUnits<'a> {
         }
         for unit in units_iter {
             if unit.unit.space {
-                buf.push(' ');
-                buf.push_str(space_per);
-                buf.push(' ');
+                buf.push_str(&space_per);
             }
             unit.write_typst(buf, conf, units);
+        }
+
+        if conf.per_mode == PerMode::Fraction {
+            buf.push(')');
         }
     }
 }
@@ -72,6 +78,10 @@ impl<'a> ToTypst for Unit<'a> {
 
 impl ToTypst for Exponent {
     fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, _units: &Units) {
+        if (conf.per_mode != PerMode::Symbol) && &self.num == "1" && self.denom.is_none() {
+            return;
+        }
+
         buf.push_str("^(");
 
         if conf.per_mode == PerMode::Symbol && self.sign == Sign::Minus {

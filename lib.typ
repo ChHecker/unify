@@ -4,6 +4,7 @@
   /// Update the formatting configuration of numbers.
   /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`num`].
   /// - `value`: Value to set the configuration to.
+
   context {
     _config.update(conf => {
       conf.at("num").at(key) = value
@@ -16,6 +17,7 @@
   /// Update the formatting configuration of units.
   /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`unit`].
   /// - `value`: Value to set the configuration to.
+
   context {
     _config.update(conf => {
       conf.at("unit").at(key) = value
@@ -28,6 +30,7 @@
   /// Update the formatting configuration of ranges ([`numrange`] and [`qtyrange`]).
   /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments `delimiter` and `space` to [`numrange`].
   /// - `value`: Value to set the configuration to.
+
   context {
     _config.update(conf => {
       conf.at("range").at(key) = value
@@ -40,6 +43,7 @@
   /// Update the formatting configuration of quantities ([`qty`] and [`qtyrange`]).
   /// - `key`: Keys of the configuration to change. Currently, this can only be `unit-space` and `rawunit`.
   /// - `value`: Value to set the configuration to.
+
   context {
     _config.update(conf => {
       conf.at("qty").at(key) = value

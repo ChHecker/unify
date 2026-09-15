@@ -37,6 +37,13 @@
     decsep = conf.at("decsep")
   }
 
+  if thousandsep == "," {
+    thousandsep = ",#h(0pt)"
+  }
+  if decsep == "," {
+    decsep = ",#h(0pt)"
+  }
+
   (multiplier: multiplier, thousand_sep: thousandsep, dec_sep: decsep)
 }
 
