@@ -76,6 +76,7 @@
   /// - `shorthand`: Shorthand of the unit, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the unit symbol.
   /// - `space`: Whether to put a space before the unit.
+
   context {
     _units.update(units => {
       units
@@ -96,6 +97,7 @@
   /// - `prefix`: Full name of the prefix.
   /// - `shorthand`: Shorthand of the prefix, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the prefix symbol.
+
   context {
     _units.update(units => {
       units
@@ -115,6 +117,7 @@
   /// - `postfix`: Full name of the postfix.
   /// - `shorthand`: Shorthand of the postfix, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the postfix symbol.
+
   context {
     _units.update(units => {
       units
@@ -127,7 +130,6 @@
     })
   }
 }
-
 
 #let unit(unit, space: none, per: none) = {
   /// Format a unit.

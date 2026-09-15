@@ -33,10 +33,13 @@ impl<'a> Units<'a> {
             }
         }
 
-        Ok(Self {
+        let units = Self {
             units_num,
             units_denom,
-        })
+        };
+        units.validate()?;
+
+        Ok(units)
     }
 }
 

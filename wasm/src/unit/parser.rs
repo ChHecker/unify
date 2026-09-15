@@ -22,7 +22,11 @@ pub struct Exponent {
 }
 
 impl<'a> Units<'a> {
-    fn validate(&self) -> crate::Result<()> {
-        todo!()
+    pub fn validate(&self) -> crate::Result<()> {
+        if self.units_num.is_empty() && self.units_denom.is_empty() {
+            return Err(String::from("empty unit"));
+        }
+
+        Ok(())
     }
 }

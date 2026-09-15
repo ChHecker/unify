@@ -5,7 +5,9 @@ use crate::unit::{PerMode, ToTypst, UnitFmtConf, Units};
 impl<'a> ToTypst for PUnits<'a> {
     fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
         if (!self.units_num.is_empty() && self.units_num[0].unit.space)
-            || (self.units_num.is_empty() && self.units_denom[0].unit.space)
+            || (self.units_num.is_empty()
+                && !self.units_denom.is_empty()
+                && self.units_denom[0].unit.space)
         {
             buf.push_str(&conf.space_first);
             buf.push(' ');
@@ -13,6 +15,12 @@ impl<'a> ToTypst for PUnits<'a> {
 
         if conf.per_mode == PerMode::Fraction {
             buf.push('(');
+        }
+
+        if self.units_num.is_empty()
+            && matches!(conf.per_mode, PerMode::Fraction | PerMode::InlineFraction)
+        {
+            buf.push('1');
         }
 
         let mut units_iter = self.units_num.into_iter();

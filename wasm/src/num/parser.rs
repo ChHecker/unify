@@ -69,6 +69,10 @@ impl Num {
     }
 
     fn validate(&self) -> crate::Result<()> {
+        if self.float.is_none() && self.exp.is_none() {
+            return Err(String::from("empty number"))
+        }
+
         if self.float.is_none() && self.uncert.is_some() {
             return Err(String::from("cannot have uncertainty without value"));
         }
