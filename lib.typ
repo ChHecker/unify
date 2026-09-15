@@ -1,4 +1,4 @@
-#import "format.typ": *
+#import "utils.typ": *
 
 #let update-num-config(key, value) = {
   /// Update the formatting configuration of numbers.

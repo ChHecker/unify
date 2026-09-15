@@ -1,6 +1,0 @@
-- [x] languages
-- [x] money
-- [x] unicode exponents
-- [x] raw units
-- [x] improve errors
-- [x] update `overview.jpg`

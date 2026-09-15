@@ -1,4 +1,4 @@
-#let wasm = plugin("unify.wasm")
+#let wasm = plugin("format.wasm")
 
 #let _units = state("units", (
   "prefixes": (),
