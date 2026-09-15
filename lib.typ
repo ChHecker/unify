@@ -66,7 +66,7 @@
     let conf = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
 
     let cbor = cbor.encode((config: conf, num: value))
-    eval(str(wasm.num(cbor)))
+    eval(str(format.num(cbor)))
   }
 }
 
@@ -142,7 +142,7 @@
     let units = _get-units()
 
     let cbor = cbor.encode((config: conf, units: units, unit: unit))
-    eval(str(wasm.unit(cbor)))
+    eval(str(format.unit(cbor)))
   }
 }
 
@@ -191,7 +191,7 @@
     }
 
     let cbor = cbor.encode((num: num, unit: unit, raw_unit: rawunit))
-    eval(str(wasm.qty(cbor)))
+    eval(str(format.qty(cbor)))
   }
 }
 
@@ -220,7 +220,7 @@
     let conf-range = _get-range-conf(delimiter: delimiter, space: space)
 
     let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
-    eval(str(wasm.numrange(cbor)))
+    eval(str(format.numrange(cbor)))
   }
 }
 
@@ -276,6 +276,6 @@
     }
 
     let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit))
-    eval(str(wasm.qtyrange(cbor)))
+    eval(str(format.qtyrange(cbor)))
   }
 }
