@@ -38,7 +38,7 @@
 
 #let update-qty-config(key, value) = {
   /// Update the formatting configuration of quantities ([`qty`] and [`qtyrange`]).
-  /// - `key`: Keys of the configuration to change. Currently, this can only be `unit-space`.
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `unit-space` and `rawunit`.
   /// - `value`: Value to set the configuration to.
   context {
     _config.update(conf => {
@@ -145,7 +145,7 @@
 #let qty(
   value,
   unit,
-  rawunit: false,
+  rawunit: none,
   space: none,
   num-unit-space: none,
   multiplier: none,
@@ -181,7 +181,12 @@
     let num = (config: conf-num, num: value)
     let unit = (config: conf-unit, units: units, unit: unit)
 
-    let cbor = cbor.encode((num: num, unit: unit))
+    let rawunit = rawunit
+    if rawunit == none {
+      rawunit = _config.get().at("qty").at("rawunit")
+    }
+
+    let cbor = cbor.encode((num: num, unit: unit, raw_unit: rawunit))
     eval(str(wasm.qty(cbor)))
   }
 }
@@ -219,7 +224,7 @@
   lower,
   upper,
   unit,
-  rawunit: false,
+  rawunit: none,
   multiplier: none,
   delimiter: none,
   space: none,
@@ -261,7 +266,12 @@
     let range = (config_num: conf-num, config_range: conf-range, lower: lower, upper: upper)
     let unit = (config: conf-unit, units: units, unit: unit)
 
-    let cbor = cbor.encode((range: range, unit: unit))
+    let rawunit = rawunit
+    if rawunit == none {
+      rawunit = _config.get().at("qty").at("rawunit")
+    }
+
+    let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit))
     eval(str(wasm.qtyrange(cbor)))
   }
 }

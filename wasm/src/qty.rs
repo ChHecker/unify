@@ -7,4 +7,5 @@ use crate::unit::TypstUnit;
 pub struct TypstQty {
     pub num: TypstNum,
     pub unit: TypstUnit,
+    pub raw_unit: bool,
 }

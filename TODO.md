@@ -1,5 +1,5 @@
 - [ ] languages
 - [x] money
 - [x] unicode exponents
-- [ ] raw units
+- [x] raw units
 - [ ] improve errors

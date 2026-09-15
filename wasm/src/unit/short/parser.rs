@@ -263,7 +263,7 @@ mod tests {
 
     #[test]
     fn exponent_unicode() {
-        let text = String::from("\u{207B}\u{00B3}");
+        let text = String::from("⁻³");
         let tokenizer = Tokenizer::new(text.chars());
         let mut iter = tokenizer.peekable();
         let exp = Exponent::new(&mut iter);

@@ -9,11 +9,17 @@ use crate::unit::{ToTypst as _, TypstUnit, UnitFmtConf, Units};
 pub struct TypstQtyRange {
     pub range: TypstNumRange,
     pub unit: TypstUnit,
+    pub raw_unit: bool,
 }
 
 pub struct QtyRange<'a> {
     pub range: NumRange,
-    pub unit: PUnits<'a>,
+    pub unit: RawUnit<'a>,
+}
+
+pub enum RawUnit<'a> {
+    Unit(PUnits<'a>),
+    Raw(&'a str),
 }
 
 pub trait ToTypst
@@ -104,7 +110,11 @@ impl<'a> ToTypst for QtyRange<'a> {
         buf.push(' ');
         buf.push_str(&conf_unit.space_first);
         buf.push(' ');
-        self.unit.write_typst(buf, conf_unit, units);
+
+        match self.unit {
+            RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
+            RawUnit::Raw(unit) => buf.push_str(unit),
+        }
     }
 }
 
@@ -150,7 +160,7 @@ mod tests {
                     }),
                 },
             },
-            unit: PUnits {
+            unit: RawUnit::Unit(PUnits {
                 units_num: vec![Unit {
                     prefix: None,
                     unit: UnitSpec {
@@ -160,7 +170,7 @@ mod tests {
                     exp: None,
                 }],
                 units_denom: vec![],
-            },
+            }),
         };
 
         let conf_num = NumFmtConf {
