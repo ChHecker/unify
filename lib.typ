@@ -1,6 +1,9 @@
 #import "format.typ": *
 
-#let set-num-config(key, value) = {
+#let update-num-config(key, value) = {
+  /// Update the formatting configuration of numbers.
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`num`].
+  /// - `value`: Value to set the configuration to.
   context {
     _config.update(conf => {
       conf.at("num").at(key) = value
@@ -9,7 +12,10 @@
   }
 }
 
-#let set-unit-config(key, value) = {
+#let update-unit-config(key, value) = {
+  /// Update the formatting configuration of units.
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`unit`].
+  /// - `value`: Value to set the configuration to.
   context {
     _config.update(conf => {
       conf.at("unit").at(key) = value
@@ -18,7 +24,10 @@
   }
 }
 
-#let set-range-config(key, value) = {
+#let update-range-config(key, value) = {
+  /// Update the formatting configuration of ranges ([`numrange`] and [`qtyrange`]).
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments `delimiter` and `space` to [`numrange`].
+  /// - `value`: Value to set the configuration to.
   context {
     _config.update(conf => {
       conf.at("range").at(key) = value
@@ -27,7 +36,10 @@
   }
 }
 
-#let set-qty-config(key, value) = {
+#let update-qty-config(key, value) = {
+  /// Update the formatting configuration of quantities ([`qty`] and [`qtyrange`]).
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `unit-space`.
+  /// - `value`: Value to set the configuration to.
   context {
     _config.update(conf => {
       conf.at("qty").at(key) = value
@@ -41,6 +53,7 @@
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
 
   // str() converts minus "-" of a number to unicode "\u2212"
   value = _to-string(value).replace("−", "-").replace(" ", "")
@@ -148,6 +161,7 @@
   /// - `space`: Space between units.
   /// - `num-unit-space`: Space between the number and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
@@ -187,6 +201,7 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
@@ -224,6 +239,7 @@
   /// - `unitspace`: Space between units.
   /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")

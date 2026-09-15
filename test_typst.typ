@@ -4,9 +4,9 @@
 #add-postfix("test", "upright(t)")
 #add-unit("test", "t", "upright(t)")
 
-#set-num-config("multiplier", "times")
-#set-range-config("delimiter", "\"to\"")
-#set-range-config("space", "#h(0.4em)")
+#update-num-config("multiplier", "times")
+#update-range-config("delimiter", "\"to\"")
+#update-range-config("space", "#h(0.4em)")
 
 #qty("-1234.567+23-15e-23", "kg m^2/s^2")
 
