@@ -74,6 +74,10 @@ impl<'a> ToTypst for PUnits<'a> {
 
 impl<'a> ToTypst for Unit<'a> {
     fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+        if self.sqrt {
+            buf.push_str("sqrt(");
+        }
+
         if let Some(prefix) = self.prefix {
             buf.push_str(prefix);
         }
@@ -82,6 +86,10 @@ impl<'a> ToTypst for Unit<'a> {
 
         if let Some(exp) = self.exp {
             exp.write_typst(buf, conf, units);
+        }
+
+        if self.sqrt {
+            buf.push(')');
         }
     }
 }
@@ -118,7 +126,7 @@ mod tests {
     #[test]
     #[ignore]
     fn units() {
-        let text = String::from("kg m / s^(2/3) / nb");
+        let text = String::from("kg sqrt(m^3) / s^(2/3) / nb");
         let tokenizer = Tokenizer::new(text.chars());
         let mut iter = tokenizer.peekable();
         let units_lookup = Default::default();

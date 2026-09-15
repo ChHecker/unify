@@ -66,7 +66,11 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
                     unit.push(*c);
                     self.iter.next();
                 }
-                Token::Unit(unit)
+                if unit == "sqrt" {
+                    Token::Sqrt
+                } else {
+                    Token::Unit(unit)
+                }
             }
         }))
     }
@@ -83,6 +87,7 @@ pub enum Token {
     ParenOpen,
     ParenClose,
     Slash,
+    Sqrt,
 }
 
 impl Display for Token {
@@ -97,6 +102,7 @@ impl Display for Token {
             Token::ParenOpen => write!(f, "("),
             Token::ParenClose => write!(f, ")"),
             Token::Slash => write!(f, "/"),
+            Token::Sqrt => write!(f, "sqrt"),
         }
     }
 }
@@ -107,7 +113,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let text = "kg m/s^(2/3)";
+        let text = "kg m/s^(2/3) sqrt(m)";
         let tokenizer = Tokenizer::new(text.chars());
         let tokens: crate::Result<Vec<Token>> = tokenizer.collect();
         assert_eq!(
@@ -122,6 +128,10 @@ mod tests {
                 Token::Number(String::from("2")),
                 Token::Slash,
                 Token::Number(String::from("3")),
+                Token::ParenClose,
+                Token::Sqrt,
+                Token::ParenOpen,
+                Token::Unit(String::from("m")),
                 Token::ParenClose,
             ])
         );

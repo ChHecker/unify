@@ -12,6 +12,7 @@ pub struct Unit<'a> {
     pub prefix: Option<&'a str>,
     pub unit: UnitSpec<'a>,
     pub exp: Option<Exponent>,
+    pub sqrt: bool,
 }
 
 #[derive(Debug, PartialEq, Eq)]

@@ -168,6 +168,7 @@ mod tests {
                         space: true,
                     },
                     exp: None,
+                    sqrt: false,
                 }],
                 units_denom: vec![],
             }),

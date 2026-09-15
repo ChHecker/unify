@@ -16,7 +16,9 @@ impl<'a> Units<'a> {
 
         while let Some(token) = iter.peek().transpose()? {
             match token {
-                Token::Unit(_) => units.push(Unit::short(&mut iter, units_lookup, false)?),
+                Token::Unit(_) | Token::Sqrt => {
+                    units.push(Unit::short(&mut iter, units_lookup, false)?)
+                }
                 Token::Slash => {
                     iter.next();
                     units.push(Unit::short(&mut iter, units_lookup, true)?);
@@ -50,8 +52,22 @@ impl<'a> Unit<'a> {
         units_lookup: &'a UnitsLookup,
         per: bool,
     ) -> crate::Result<Self> {
+        let mut sqrt = false;
+
         let text = match iter.next().transpose()? {
             Some(Token::Unit(unit)) => unit,
+            Some(Token::Sqrt) => {
+                if !matches!(iter.next().transpose()?, Some(Token::ParenOpen)) {
+                    return Err(String::from("expected `(` after sqrt"));
+                }
+                let unit = match iter.next().transpose()? {
+                    Some(Token::Unit(unit)) => unit,
+                    Some(t) => return Err(format!("unexpected token '{t}'")),
+                    None => return Err(String::from("invalid unit")),
+                };
+                sqrt = true;
+                unit
+            }
             Some(t) => return Err(format!("unexpected token '{t}'")),
             None => return Err(String::from("invalid unit")),
         };
@@ -88,6 +104,10 @@ impl<'a> Unit<'a> {
             _ => None,
         };
 
+        if sqrt && !matches!(iter.next().transpose()?, Some(Token::ParenClose)) {
+            return Err(String::from("expected `)`"));
+        }
+
         if per {
             match &mut exp {
                 Some(exp) => match exp.sign {
@@ -106,7 +126,12 @@ impl<'a> Unit<'a> {
             }
         }
 
-        Ok(Self { prefix, unit, exp })
+        Ok(Self {
+            prefix,
+            unit,
+            exp,
+            sqrt,
+        })
     }
 }
 
@@ -215,7 +240,7 @@ mod tests {
 
     #[test]
     fn unit() {
-        let text = String::from("kg^(2/3)/m^2");
+        let text = String::from("kg^(2/3) sqrt(m)/s^2");
         let tokenizer = Tokenizer::new(text.chars());
         let mut iter = tokenizer.peekable();
         let units_lookup = Default::default();
@@ -224,27 +249,38 @@ mod tests {
         let kilo = units_lookup.get_prefix_short("k").unwrap();
         let gram = units_lookup.get_unit_short("g").unwrap();
         let meter = units_lookup.get_unit_short("m").unwrap();
+        let second = units_lookup.get_unit_short("s").unwrap();
 
         assert_eq!(
             units,
             Ok(Units {
-                units_num: vec![Unit {
-                    prefix: Some(kilo),
-                    unit: gram,
-                    exp: Some(Exponent {
-                        sign: Sign::Plus,
-                        num: String::from("2"),
-                        denom: Some(String::from("3"))
-                    })
-                }],
+                units_num: vec![
+                    Unit {
+                        prefix: Some(kilo),
+                        unit: gram,
+                        exp: Some(Exponent {
+                            sign: Sign::Plus,
+                            num: String::from("2"),
+                            denom: Some(String::from("3"))
+                        }),
+                        sqrt: false
+                    },
+                    Unit {
+                        prefix: None,
+                        unit: meter,
+                        exp: None,
+                        sqrt: true
+                    }
+                ],
                 units_denom: vec![Unit {
                     prefix: None,
-                    unit: meter,
+                    unit: second,
                     exp: Some(Exponent {
                         sign: Sign::Minus,
                         num: String::from("2"),
                         denom: None
-                    })
+                    }),
+                    sqrt: false
                 }]
             })
         )

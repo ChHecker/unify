@@ -63,9 +63,13 @@ impl<'a> Unit<'a> {
                     Some(t) => return Err(format!("unexpected token '{t}'")),
                     _ => return Err(String::from("invalid token")),
                 };
-                units_lookup.get_unit(&text).ok_or(format!("invalid unit '{text}'"))?
+                units_lookup
+                    .get_unit(&text)
+                    .ok_or(format!("invalid unit '{text}'"))?
             }
-            None => units_lookup.get_unit(&text).ok_or(format!("invalid unit '{text}'"))?,
+            None => units_lookup
+                .get_unit(&text)
+                .ok_or(format!("invalid unit '{text}'"))?,
         };
         let postfix = match iter.peek().transpose()? {
             Some(Token::Unit(text)) => {
@@ -101,7 +105,12 @@ impl<'a> Unit<'a> {
             }
         }
 
-        Ok(Self { prefix, unit, exp })
+        Ok(Self {
+            prefix,
+            unit,
+            exp,
+            sqrt: false,
+        })
     }
 }
 
@@ -129,7 +138,8 @@ mod tests {
                 units_num: vec![Unit {
                     prefix: Some(kilo),
                     unit: gram,
-                    exp: None
+                    exp: None,
+                    sqrt: false
                 }],
                 units_denom: vec![Unit {
                     prefix: None,
@@ -137,8 +147,9 @@ mod tests {
                     exp: Some(Exponent {
                         sign: Sign::Minus,
                         num: String::from("2"),
-                        denom: None
-                    })
+                        denom: None,
+                    }),
+                    sqrt: false
                 }]
             })
         )
