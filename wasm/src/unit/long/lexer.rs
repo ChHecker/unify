@@ -22,6 +22,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
     fn next(&mut self) -> Option<Self::Item> {
         Some(Ok(match self.iter.next()? {
             ' ' => return self.next(),
+            '/' => Token::Per,
             c if c.is_alphabetic() => {
                 let mut unit = String::from(c);
                 while let Some(c) = self.iter.peek()
