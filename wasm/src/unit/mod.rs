@@ -62,7 +62,7 @@ impl TryFrom<TypstUnitFmtConf> for UnitFmtConf {
 pub struct Units {
     pub prefixes: Vec<CustomPrefix>,
     pub units: Vec<CustomUnit>,
-    pub postfixes: Vec<CustomPrefix>,
+    pub postfixes: Vec<CustomPostfix>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -78,6 +78,12 @@ pub struct CustomUnit {
     pub short: String,
     pub symbol: String,
     pub space: bool,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CustomPostfix {
+    pub long: String,
+    pub symbol: String,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

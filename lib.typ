@@ -1,41 +1,17 @@
 #import "format.typ": *
 
-#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)") = {
+#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)", decsep: ".") = {
   /// Format a number.
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
 
   // str() converts minus "-" of a number to unicode "\u2212"
-  value = _to-string(value).replace("−", "-").replace(" ", "") //.replace(",", ".")
+  value = _to-string(value).replace("−", "-").replace(" ", "")
 
-  let match-value = value.match(_re-num)
-  if match-value == none {
-    panic("invalid number: " + value)
-  }
-  let captures-value = match-value.captures
-
-  let upper = none
-  let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
-    lower = none
-  } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
-  }
-
-  let formatted = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
-    upper: upper,
-    lower: lower,
-    multiplier: multiplier,
-    thousandsep: thousandsep,
-  )
-
-  formatted = "$" + formatted + "$"
-  eval(formatted)
+  let conf = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
+  let cbor = cbor.encode((config: conf, num: value))
+  eval(str(wasm.num(cbor)))
 }
 
 #let add-unit(unit, shorthand, symbol, space: true) = {
@@ -45,14 +21,16 @@
   /// - `symbol`: String that will be inserted as the unit symbol.
   /// - `space`: Whether to put a space before the unit.
   context {
-    let lang = _get-language()
-
-    _lang-db.update(db => {
-      db.at(lang).at("units").at(0).insert(unit, symbol)
-      db.at(lang).at("units").at(1).insert(shorthand, symbol)
-      db.at(lang).at("units").at(2).insert(unit, space)
-      db.at(lang).at("units").at(3).insert(shorthand, space)
-      db
+    _units.update(units => {
+      units
+        .at("units")
+        .push((
+          long: unit,
+          short: shorthand,
+          symbol: symbol,
+          space: space,
+        ))
+      units
     })
   }
 }
@@ -63,12 +41,33 @@
   /// - `shorthand`: Shorthand of the prefix, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the prefix symbol.
   context {
-    let lang = _get-language()
+    _units.update(units => {
+      units
+        .at("prefixes")
+        .push((
+          long: prefix,
+          short: shorthand,
+          symbol: symbol,
+        ))
+      units
+    })
+  }
+}
 
-    _lang-db.update(db => {
-      db.at(lang).at("prefixes").at(0).insert(prefix, symbol)
-      db.at(lang).at("prefixes").at(1).insert(shorthand, symbol)
-      db
+#let add-postfix(postfix, symbol) = {
+  /// Add a new postfix.
+  /// - `postfix`: Full name of the postfix.
+  /// - `shorthand`: Shorthand of the postfix, usually only 1-2 letters.
+  /// - `symbol`: String that will be inserted as the postfix symbol.
+  context {
+    _units.update(units => {
+      units
+        .at("postfixes")
+        .push((
+          long: postfix,
+          symbol: symbol,
+        ))
+      units
     })
   }
 }
@@ -80,12 +79,11 @@
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
+  let conf = (space: space, space_first: "", per_mode: per)
   context {
-    let formatted-unit = ""
-    formatted-unit = _format-unit(unit, space: space, first-space: "", per: per)
-
-    let formatted = "$" + formatted-unit + "$"
-    eval(formatted)
+    let units = _units.get()
+    let cbor = cbor.encode((config: conf, units: units, unit: unit))
+    eval(str(wasm.unit(cbor)))
   }
 }
 
@@ -97,6 +95,7 @@
   num-unit-space: "#h(0.166667em)",
   multiplier: "dot",
   thousandsep: "#h(0.166667em)",
+  decsep: ".",
   per: "symbol",
 ) = {
   /// Format a quantity (i.e. number with a unit).
@@ -110,41 +109,18 @@
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
-  let match-value = value.match(_re-num)
-  if match-value == none {
-    panic("invalid number: " + value)
-  }
-  let captures-value = match-value.captures
 
-  let upper = none
-  let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
-    lower = none
-  } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
-  }
-
-  let formatted-value = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
-    upper: upper,
-    lower: lower,
-    multiplier: multiplier,
-    thousandsep: thousandsep,
-  )
+  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
+  let conf-unit = (space: space, space_first: num-unit-space, per_mode: per)
 
   context {
-    let formatted-unit = ""
-    if rawunit {
-      formatted-unit = space + unit
-    } else {
-      formatted-unit = _format-unit(unit, space: space, first-space: num-unit-space, per: per)
-    }
+    let units = _units.get()
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    let num = (config: conf-num, num: value)
+    let unit = (config: conf-unit, units: units, unit: unit)
+
+    let cbor = cbor.encode((num: num, unit: unit))
+    eval(str(wasm.qty(cbor)))
   }
 }
 
@@ -155,6 +131,7 @@
   delimiter: "-",
   space: "#h(0.16667em)",
   thousandsep: "#h(0.166667em)",
+  decsep: ".",
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -163,28 +140,13 @@
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
-  let match-lower = lower.match(_re-num)
-  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
-  let captures-lower = match-lower.captures
-
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
-  let match-upper = upper.match(_re-num)
-  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
-  let captures-upper = match-upper.captures
 
-  let formatted = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
-    multiplier: multiplier,
-    delimiter: delimiter,
-    thousandsep: thousandsep,
-    space: space,
-  )
-  formatted = "$" + formatted + "$"
+  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
+  let conf-range = (delimiter: delimiter, space: space)
 
-  eval(formatted)
+  let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
+  eval(str(wasm.numrange(cbor)))
 }
 
 #let qtyrange(
@@ -198,6 +160,7 @@
   unitspace: "#h(0.16667em)",
   range-unit-space: "#h(0.166667em)",
   thousandsep: "#h(0.166667em)",
+  decsep: ".",
   per: "symbol",
 ) = {
   /// Format a range with a unit.
@@ -213,36 +176,19 @@
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
-  let match-lower = lower.match(_re-num)
-  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
-  let captures-lower = match-lower.captures
-
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
-  let match-upper = upper.match(_re-num)
-  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
-  let captures-upper = match-upper.captures
 
-  let formatted-value = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
-    multiplier: multiplier,
-    delimiter: delimiter,
-    space: space,
-    thousandsep: thousandsep,
-    force-parentheses: true,
-  )
+  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
+  let conf-range = (delimiter: delimiter, space: space)
+  let conf-unit = (space: space, space_first: range-unit-space, per_mode: per)
 
   context {
-    let formatted-unit = ""
-    if rawunit {
-      formatted-unit = space + unit
-    } else {
-      formatted-unit = _format-unit(unit, space: unitspace, first-space: range-unit-space, per: per)
-    }
+    let units = _units.get()
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    let range = (config_num: conf-num, config_range: conf-range, lower: lower, upper: upper)
+    let unit = (config: conf-unit, units: units, unit: unit)
+
+    let cbor = cbor.encode((range: range, unit: unit))
+    eval(str(wasm.qtyrange(cbor)))
   }
 }
