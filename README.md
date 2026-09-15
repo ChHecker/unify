@@ -8,16 +8,17 @@
 #import "@preview/unify:0.8.1": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
-$ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
+$ qty("1.3+1.2-0.3e3", "erg/cm^(3/2)/s", space: "dot", num-unit-space: "#h(2mm)") $
 $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
-$ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
+$ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"", range-unit-space: "#h(3mm)") $
+$ qty("55.36", "usd") $
 ```
 <img src="examples/overview.jpg" width="300" alt="Example of unify rendering scientific notation with uncertainties and units using custom spacing, thousands separators, and delimiters.">
 
 Right now, physical, monetary, and binary units are supported. New issues or pull requests for new units are welcome!
 
 ## Multilingual support 
-The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`, and in the `lib.typ` file you should fix the `lang-db` state for your files.
+The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`. The Rust crate in `wasm` then automatically compiles them into the binary.
 
 ## `num`
 `num` uses string parsing in order to typeset numbers, including separators between the thousands. They can have the following form:
@@ -48,7 +49,17 @@ The shorthand notation also has four parts:
 
 Note: Use `u` for micro.
 
-The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). Your own units etc. can be permanently added in these files. At runtime, they can be added using `add-unit` and `add-prefix`, respectively. The formats for the pre- and postfixes are:
+### Adding units
+#### Compile time
+The included units, prefixes, and postfixes are compiled into the WASM binary at compile time from `units/prefixes_xx.csv`, `units/units_xx.csv`, and `units/postfixes_xx.csv` (in the library directory, where `xx` is the language). You can add you own units etc. by appending them to these files, and recompiling the Rust crate in `wasm` and moving the output `WASM` to `format.wasm`:
+```bash
+cd wasm
+cargo build --release --target wasm32-unknown-unknown
+cp target/wasm32-unknown-unknown/release/unify.wasm ../format.wasm
+```
+
+#### Runtime
+At runtime, units can be added using `add-unit`, `add-prefix`, and `add-postfix`, respectively. The formats for the pre- and postfixes are:
 
 | pre-/postfix | shorthand | symbol       |
 | ------------ | --------- | ------------ |
