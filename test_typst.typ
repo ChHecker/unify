@@ -12,4 +12,5 @@
 
 #qty("-1234.567+23-15e-23", "kg m^2/s^2")
 
-#qtyrange("1234.567e-23", "1234.567e-22", "dB")
+#add-unit("decibela", "dBa", "upright(\"dBa\")")
+#qtyrange("1234.567e-23", "1234.567e-22", "dBa")
