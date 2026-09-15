@@ -1,4 +1,4 @@
-- [ ] languages
+- [x] languages
 - [x] money
 - [x] unicode exponents
 - [x] raw units

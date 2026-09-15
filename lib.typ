@@ -135,7 +135,7 @@
 
   context {
     let conf = _get-unit-conf(space: space, per: per, first-space: "")
-    let units = _units.get()
+    let units = _get-units()
 
     let cbor = cbor.encode((config: conf, units: units, unit: unit))
     eval(str(wasm.unit(cbor)))
@@ -176,7 +176,7 @@
     let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
     let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
 
-    let units = _units.get()
+    let units = _get-units()
 
     let num = (config: conf-num, num: value)
     let unit = (config: conf-unit, units: units, unit: unit)
@@ -261,7 +261,7 @@
     let conf-range = _get-range-conf(delimiter: delimiter, space: space)
     let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
 
-    let units = _units.get()
+    let units = _get-units()
 
     let range = (config_num: conf-num, config_range: conf-range, lower: lower, upper: upper)
     let unit = (config: conf-unit, units: units, unit: unit)

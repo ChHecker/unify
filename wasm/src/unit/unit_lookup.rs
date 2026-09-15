@@ -11,19 +11,26 @@ pub struct UnitSpec<'a> {
 }
 
 impl Units {
+    fn get_lang(&self) -> &str {
+        match &self.lang {
+            Some(lang) if UNITS.contains_key(lang) => lang,
+            _ => "en",
+        }
+    }
+
     pub fn contains_prefix(&self, prefix: &str) -> bool {
         let prefix_custom = self.prefixes.iter().find(|u| u.long == prefix);
         if prefix_custom.is_some() {
             return true;
         }
-        PREFIXES.contains_key(prefix)
+        PREFIXES.get(self.get_lang()).unwrap().contains_key(prefix)
     }
 
     pub fn get_prefix(&self, prefix: &str) -> Option<&'_ str> {
         let prefix_custom = self.prefixes.iter().find(|u| u.long == prefix);
         match prefix_custom {
             Some(prefix) => Some(&prefix.symbol),
-            None => PREFIXES.get(prefix).copied(),
+            None => PREFIXES.get(self.get_lang()).unwrap().get(prefix).copied(),
         }
     }
 
@@ -32,7 +39,7 @@ impl Units {
         if unit_custom.is_some() {
             return true;
         }
-        UNITS.contains_key(unit)
+        UNITS.get(self.get_lang()).unwrap().contains_key(unit)
     }
 
     pub fn get_unit(&self, unit: &str) -> Option<UnitSpec<'_>> {
@@ -42,7 +49,7 @@ impl Units {
                 symbol: &unit.symbol,
                 space: unit.space,
             }),
-            None => UNITS.get(unit).copied(),
+            None => UNITS.get(self.get_lang()).unwrap().get(unit).copied(),
         }
     }
 
@@ -67,14 +74,21 @@ impl Units {
         if prefix_custom.is_some() {
             return true;
         }
-        PREFIXES_SHORT.contains_key(prefix)
+        PREFIXES_SHORT
+            .get(self.get_lang())
+            .unwrap()
+            .contains_key(prefix)
     }
 
     pub fn get_prefix_short(&self, prefix: &str) -> Option<&'_ str> {
         let prefix_custom = self.prefixes.iter().find(|u| u.short == prefix);
         match prefix_custom {
             Some(prefix) => Some(&prefix.symbol),
-            None => PREFIXES_SHORT.get(prefix).copied(),
+            None => PREFIXES_SHORT
+                .get(self.get_lang())
+                .unwrap()
+                .get(prefix)
+                .copied(),
         }
     }
 
@@ -83,7 +97,7 @@ impl Units {
         if unit_custom.is_some() {
             return true;
         }
-        UNITS_SHORT.contains_key(unit)
+        UNITS_SHORT.get(self.get_lang()).unwrap().contains_key(unit)
     }
 
     pub fn get_unit_short(&self, unit: &str) -> Option<UnitSpec<'_>> {
@@ -93,7 +107,23 @@ impl Units {
                 symbol: &unit.symbol,
                 space: unit.space,
             }),
-            None => UNITS_SHORT.get(unit).copied(),
+            None => UNITS_SHORT.get(self.get_lang()).unwrap().get(unit).copied(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::unit::Units;
+
+    #[test]
+    fn lookup() {
+        let units = Units {
+            lang: None,
+            prefixes: vec![],
+            units: vec![],
+            postfixes: vec![],
+        };
+        assert!(units.contains_unit_short("g"));
     }
 }

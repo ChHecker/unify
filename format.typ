@@ -1,20 +1,5 @@
 #import "init.typ": *
 
-#let _unicode-exponents = (
-  ("\u2070", "0"),
-  ("\u00B9", "1"),
-  ("\u00B2", "2"),
-  ("\u00B3", "3"),
-  ("\u2074", "4"),
-  ("\u2075", "5"),
-  ("\u2076", "6"),
-  ("\u2077", "7"),
-  ("\u2078", "8"),
-  ("\u2079", "9"),
-  ("\u207A", "+"),
-  ("\u207B", "-"),
-)
-
 #let _to-string(it) = {
   if type(it) == str {
     it
@@ -33,23 +18,10 @@
   }
 }
 
-#let _unicode-exponent-list = for (unicode, ascii) in _unicode-exponents {
-  (unicode,)
-}
-
-#let _exponent-pattern = regex("[" + _unicode-exponent-list.join("|") + "]+")
-
-#let _replace-unicode-exponents(unit-str) = {
-  let exponent-matches = unit-str.matches(_exponent-pattern)
-  let exponent = ""
-  for match in exponent-matches {
-    exponent = "^" + match.text
-    for (unicode, ascii) in _unicode-exponents {
-      exponent = exponent.replace(regex(unicode), ascii)
-    }
-    unit-str = unit-str.replace(match.text, exponent)
-  }
-  unit-str
+#let _get-units() = {
+  let units = _units.get()
+  units.insert("lang", text.lang)
+  units
 }
 
 #let _get-num-conf(multiplier: none, thousandsep: none, decsep: none) = {

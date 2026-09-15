@@ -1,4 +1,3 @@
-
 use std::str::FromStr;
 
 use serde::Deserialize;
@@ -6,9 +5,9 @@ use serde::Deserialize;
 pub mod long;
 pub mod short;
 
-pub mod unit_lookup;
 pub mod parser;
 pub mod typst;
+pub mod unit_lookup;
 
 pub trait ToTypst
 where
@@ -60,6 +59,7 @@ impl TryFrom<TypstUnitFmtConf> for UnitFmtConf {
 
 #[derive(Debug, Deserialize)]
 pub struct Units {
+    pub lang: Option<String>,
     pub prefixes: Vec<CustomPrefix>,
     pub units: Vec<CustomUnit>,
     pub postfixes: Vec<CustomPostfix>,
@@ -110,6 +110,11 @@ impl FromStr for PerMode {
 #[cfg(test)]
 impl Default for Units {
     fn default() -> Self {
-        Self { prefixes: Default::default(), units: Default::default(), postfixes: Default::default() }
+        Self {
+            lang: None,
+            prefixes: Default::default(),
+            units: Default::default(),
+            postfixes: Default::default(),
+        }
     }
 }
