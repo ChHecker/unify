@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::iter::Peekable;
 
 use crate::Integer;
@@ -51,7 +52,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
                 }
                 Token::Int(int)
             }
-            c => return Some(Err(format!("unexpected token {}", c))),
+            c => return Some(Err(format!("unexpected token '{}'", c))),
         }))
     }
 }
@@ -65,6 +66,20 @@ pub enum Token {
     PlusMinus,
     ParenOpen,
     ParenClose,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Int(int) => write!(f, "{}", int),
+            Token::Sign(sign) => write!(f, "{}", sign),
+            Token::DecSep => write!(f, "decsep"),
+            Token::Exp => write!(f, "^"),
+            Token::PlusMinus => write!(f, "+-"),
+            Token::ParenOpen => write!(f, "("),
+            Token::ParenClose => write!(f, ")"),
+        }
+    }
 }
 
 #[cfg(test)]

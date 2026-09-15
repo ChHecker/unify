@@ -48,6 +48,7 @@ impl<'a> Unit<'a> {
     ) -> crate::Result<Self> {
         let text = match iter.next().transpose()? {
             Some(Token::Unit(text)) => text,
+            Some(t) => return Err(format!("unexpected token '{t}'")),
             _ => return Err(String::from("invalid token")),
         };
 
@@ -56,11 +57,12 @@ impl<'a> Unit<'a> {
             Some(_) => {
                 let text = match iter.next().transpose()? {
                     Some(Token::Unit(text)) => text,
+                    Some(t) => return Err(format!("unexpected token '{t}'")),
                     _ => return Err(String::from("invalid token")),
                 };
-                units_lookup.get_unit(&text).ok_or("invalid unit")?
+                units_lookup.get_unit(&text).ok_or(format!("invalid unit '{text}'"))?
             }
-            None => units_lookup.get_unit(&text).ok_or("invalid unit")?,
+            None => units_lookup.get_unit(&text).ok_or(format!("invalid unit '{text}'"))?,
         };
         let postfix = match iter.peek().transpose()? {
             Some(Token::Unit(text)) => {

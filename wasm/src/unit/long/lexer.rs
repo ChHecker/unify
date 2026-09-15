@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::iter::Peekable;
 
 pub struct Tokenizer<I: Iterator<Item = char>> {
@@ -37,7 +38,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
                     _ => Token::Unit(unit),
                 }
             }
-            c => return Some(Err(format!("unexpected token {c}"))),
+            c => return Some(Err(format!("unexpected token '{c}'"))),
         }))
     }
 }
@@ -46,6 +47,15 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
 pub enum Token {
     Unit(String),
     Per,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Unit(unit) => write!(f, "{unit}"),
+            Token::Per => write!(f, "per"),
+        }
+    }
 }
 
 #[cfg(test)]

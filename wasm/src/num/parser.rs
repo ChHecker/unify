@@ -52,8 +52,15 @@ impl Num {
         };
         let uncert = Uncertainty::new(&mut iter)?;
         let exp = Exponent::new(&mut iter)?;
-        if iter.next().is_some() {
-            return Err(String::from("invalid number"));
+        if let Some(next) = iter.next() {
+            match next? {
+                Token::Int(_) => return Err(String::from("unexpected number after the main number")),
+                Token::Sign(_) => return Err(String::from("too many uncertainties")),
+                Token::DecSep => return Err(String::from("too many decimal separators")),
+                Token::Exp => return Err(String::from("too many exponentials")),
+                Token::PlusMinus => return Err(String::from("too many uncertainties")),
+                Token::ParenOpen | Token::ParenClose => return Err(String::from("unexpected paranthesis")),
+            }
         }
 
         let num = Self { float, uncert, exp };
@@ -102,7 +109,7 @@ impl Float {
     ) -> crate::Result<String> {
         match iter.next().ok_or("invalid number")?? {
             Token::Int(int) => Ok(int),
-            _ => Err(String::from("unexpected token")),
+            t => Err(format!("unexpected token '{t}'")),
         }
     }
 }

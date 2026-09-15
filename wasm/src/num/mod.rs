@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::fmt::Display;
 
 use serde::Deserialize;
 
@@ -37,5 +38,14 @@ pub struct NumFmtConf {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Sign {
     Plus,
-    Minus
+    Minus,
+}
+
+impl Display for Sign {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Sign::Plus => write!(f, "+"),
+            Sign::Minus => write!(f, "-"),
+        }
+    }
 }

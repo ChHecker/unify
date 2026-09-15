@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::iter::Peekable;
 
 use crate::num::Sign;
@@ -82,6 +83,22 @@ pub enum Token {
     ParenOpen,
     ParenClose,
     Slash,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Unit(unit) => write!(f, "{unit}"),
+            Token::Number(num) => write!(f, "{num}"),
+            Token::Sign(sign) => write!(f, "{sign}"),
+            Token::Exponent(exp) => write!(f, "{exp}"),
+            Token::ExponentSign(sign) => write!(f, "{sign}"),
+            Token::Circ => write!(f, "^"),
+            Token::ParenOpen => write!(f, "("),
+            Token::ParenClose => write!(f, ")"),
+            Token::Slash => write!(f, "/"),
+        }
+    }
 }
 
 #[cfg(test)]

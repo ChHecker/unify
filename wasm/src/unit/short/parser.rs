@@ -21,7 +21,7 @@ impl<'a> Units<'a> {
                     iter.next();
                     units.push(Unit::short(&mut iter, units_lookup, true)?);
                 }
-                _ => return Err(String::from("unexpected token")),
+                t => return Err(format!("unexpected token '{t}'")),
             }
         }
 
@@ -49,7 +49,8 @@ impl<'a> Unit<'a> {
     ) -> crate::Result<Self> {
         let text = match iter.next().transpose()? {
             Some(Token::Unit(unit)) => unit,
-            _ => return Err(String::from("invalid token")),
+            Some(t) => return Err(format!("unexpected token '{t}'")),
+            None => return Err(String::from("invalid unit")),
         };
 
         let (prefix, unit) = if let Some(unit) = units_lookup.get_unit_short(&text) {
@@ -64,14 +65,14 @@ impl<'a> Unit<'a> {
                     prefix = Some(prefix_cur);
                     match units_lookup.get_unit_short(&text[i..]) {
                         Some(unit_cur) => unit = Some(unit_cur),
-                        None => return Err(String::from("invalid unit")),
+                        None => return Err(format!("invalid unit '{}'", &text[i..])),
                     }
                 }
             }
 
             match (prefix, unit) {
                 (Some(prefix), Some(unit)) => (Some(prefix), unit),
-                _ => return Err(String::from("invalid unit")),
+                _ => return Err(format!("invalid unit '{text}'")),
             }
         };
 
@@ -119,7 +120,7 @@ impl Exponent {
             Some(Token::Sign(sign)) => {
                 let num = match iter.next().transpose()? {
                     Some(Token::Number(num)) => num,
-                    Some(_) => return Err(String::from("unexpected token in exponent")),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
                     None => return Err(String::from("invalid exponent")),
                 };
 
@@ -141,7 +142,7 @@ impl Exponent {
 
                 let num = match iter.next().transpose()? {
                     Some(Token::Number(num)) => num,
-                    Some(_) => return Err(String::from("unexpected token in exponent")),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
                     None => return Err(String::from("invalid exponent")),
                 };
 
@@ -151,15 +152,17 @@ impl Exponent {
 
                         match iter.next().transpose()? {
                             Some(Token::Number(num)) => Some(num),
-                            Some(_) => return Err(String::from("unexpected token in exponent")),
+                            Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
                             None => return Err(String::from("invalid exponent")),
                         }
                     }
                     _ => None,
                 };
 
-                if !matches!(iter.next().transpose()?, Some(Token::ParenClose)) {
-                    return Err(String::from("unexpected token in exponent"));
+                match iter.next().transpose()? {
+                    Some(Token::ParenClose) => (),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
+                    None => return Err(String::from("invalid exponent")),
                 }
 
                 Self { sign, num, denom }
@@ -194,8 +197,8 @@ impl Exponent {
                     num,
                     denom: None,
                 }
-            },
-            Some(_) => return Err(String::from("unexpected token in exponent")),
+            }
+            Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
             None => return Err(String::from("invalid exponent")),
         })
     }
