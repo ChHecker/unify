@@ -25,7 +25,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
             c if c.is_alphabetic() => {
                 let mut unit = String::from(c);
                 while let Some(c) = self.iter.peek()
-                    && c.is_alphabetic()
+                    && c.is_alphanumeric()
                 {
                     unit.push(*c);
                     self.iter.next();

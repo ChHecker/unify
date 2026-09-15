@@ -116,10 +116,13 @@ fn write_dec(int: Integer, buf: &mut String, config: &NumFmtConf) {
 
         let range = 3 * (len - 1)..3 * len;
         buf.push_str(&int[range]);
+
+        if rem != 0 {
+            buf.push_str(&config.thousand_sep);
+        }
     }
 
     if rem != 0 {
-        buf.push_str(&config.thousand_sep);
         buf.push_str(&int[3 * len..]);
     }
 }
