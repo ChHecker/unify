@@ -4,16 +4,16 @@ use crate::unit::{PerMode, ToTypst, UnitFmtConf, Units};
 
 impl<'a> ToTypst for PUnits<'a> {
     fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+        let has_denom = !self.units_denom.is_empty();
+
         if (!self.units_num.is_empty() && self.units_num[0].unit.space)
-            || (self.units_num.is_empty()
-                && !self.units_denom.is_empty()
-                && self.units_denom[0].unit.space)
+            || (self.units_num.is_empty() && has_denom && self.units_denom[0].unit.space)
         {
             buf.push_str(&conf.space_first);
             buf.push(' ');
         }
 
-        if conf.per_mode == PerMode::Fraction {
+        if has_denom && conf.per_mode == PerMode::Fraction {
             buf.push('(');
         }
 
@@ -36,36 +36,38 @@ impl<'a> ToTypst for PUnits<'a> {
             unit.write_typst(buf, conf, units);
         }
 
-        let space_per = match conf.per_mode {
-            PerMode::Symbol => {
-                buf.push(' ');
-                buf.push_str(&conf.space);
-                buf.push(' ');
-                format!(" {} ", conf.space)
-            }
-            PerMode::Fraction => {
-                buf.push_str(")/(");
-                format!(" {} ", conf.space)
-            }
-            PerMode::InlineFraction => {
-                buf.push_str("\\/");
-                String::from("\\/")
-            }
-        };
+        if has_denom {
+            let space_per = match conf.per_mode {
+                PerMode::Symbol => {
+                    buf.push(' ');
+                    buf.push_str(&conf.space);
+                    buf.push(' ');
+                    format!(" {} ", conf.space)
+                }
+                PerMode::Fraction => {
+                    buf.push_str(")/(");
+                    format!(" {} ", conf.space)
+                }
+                PerMode::InlineFraction => {
+                    buf.push_str("\\/");
+                    String::from("\\/")
+                }
+            };
 
-        let mut units_iter = self.units_denom.into_iter();
-        if let Some(unit) = units_iter.next() {
-            unit.write_typst(buf, conf, units);
-        }
-        for unit in units_iter {
-            if unit.unit.space {
-                buf.push_str(&space_per);
+            let mut units_iter = self.units_denom.into_iter();
+            if let Some(unit) = units_iter.next() {
+                unit.write_typst(buf, conf, units);
             }
-            unit.write_typst(buf, conf, units);
-        }
+            for unit in units_iter {
+                if unit.unit.space {
+                    buf.push_str(&space_per);
+                }
+                unit.write_typst(buf, conf, units);
+            }
 
-        if conf.per_mode == PerMode::Fraction {
-            buf.push(')');
+            if conf.per_mode == PerMode::Fraction {
+                buf.push(')');
+            }
         }
     }
 }

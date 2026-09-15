@@ -42,10 +42,10 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
             '\u{2079}' => Token::Exponent('9'),
             '\u{207A}' => Token::ExponentSign(Sign::Plus),
             '\u{207B}' => Token::ExponentSign(Sign::Minus),
-            c if c.is_numeric() => {
+            c if c.is_ascii_digit() => {
                 let mut num = String::from(c);
                 while let Some(c) = self.iter.peek()
-                    && c.is_numeric()
+                    && c.is_ascii_digit()
                 {
                     num.push(*c);
                     self.iter.next();

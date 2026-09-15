@@ -38,10 +38,10 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
             ')' => Token::ParenClose,
             'e' => Token::Exp,
             c if c == ',' || c == '.' => Token::DecSep,
-            c if c.is_numeric() => {
+            c if c.is_ascii_digit() => {
                 let mut int = String::from(c);
                 while let Some(c) = self.iter.peek() {
-                    if c.is_numeric() {
+                    if c.is_ascii_digit() {
                         int.push(*c);
                         self.iter.next();
                     } else if *c == ' ' {
