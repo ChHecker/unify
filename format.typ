@@ -51,3 +51,45 @@
   }
   unit-str
 }
+
+#let _get-num-conf(multiplier: none, thousandsep: none, decsep: none) = {
+  let conf = _config.get().at("num")
+
+  if multiplier == none {
+    multiplier = conf.at("multiplier")
+  }
+  if thousandsep == none {
+    thousandsep = conf.at("thousandsep")
+  }
+  if decsep == none {
+    decsep = conf.at("decsep")
+  }
+
+  (multiplier: multiplier, thousand_sep: thousandsep, dec_sep: decsep)
+}
+
+#let _get-unit-conf(space: none, per: none, first-space: "") = {
+  let conf = _config.get().at("unit")
+
+  if space == none {
+    space = conf.at("space")
+  }
+  if per == none {
+    per = conf.at("per")
+  }
+
+  (space: space, space_first: first-space, per_mode: per)
+}
+
+#let _get-range-conf(delimiter: none, space: none) = {
+  let conf = _config.get().at("range")
+
+  if delimiter == none {
+    delimiter = conf.at("delimiter")
+  }
+  if space == none {
+    space = conf.at("space")
+  }
+
+  (delimiter: delimiter, space: space)
+}

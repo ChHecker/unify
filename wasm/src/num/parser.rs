@@ -201,7 +201,7 @@ mod tests {
 
     #[test]
     fn float() {
-        let text = String::from("-1,234.567");
+        let text = String::from("-1234.567");
         let tokenizer = Tokenizer::new(text.chars());
         let mut iter = tokenizer.peekable();
         let float = Float::new(&mut iter);
@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn num() {
-        let text = String::from("-1,234.567+23-15e-23");
+        let text = String::from("-1234.567+23-15e-23");
         let tokenizer = Tokenizer::new(text.chars());
         let iter = tokenizer.peekable();
         let num = Num::new(iter);

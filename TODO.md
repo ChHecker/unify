@@ -1,2 +1,5 @@
 - [ ] languages
-- [ ] money
+- [x] money
+- [ ] unicode exponents
+- [ ] raw units
+- [ ] improve errors

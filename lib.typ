@@ -1,6 +1,42 @@
 #import "format.typ": *
 
-#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)", decsep: ".") = {
+#let set-num-config(key, value) = {
+  context {
+    _config.update(conf => {
+      conf.at("num").at(key) = value
+      conf
+    })
+  }
+}
+
+#let set-unit-config(key, value) = {
+  context {
+    _config.update(conf => {
+      conf.at("unit").at(key) = value
+      conf
+    })
+  }
+}
+
+#let set-range-config(key, value) = {
+  context {
+    _config.update(conf => {
+      conf.at("range").at(key) = value
+      conf
+    })
+  }
+}
+
+#let set-qty-config(key, value) = {
+  context {
+    _config.update(conf => {
+      conf.at("qty").at(key) = value
+      conf
+    })
+  }
+}
+
+#let num(value, multiplier: none, thousandsep: none, decsep: none) = {
   /// Format a number.
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
@@ -9,9 +45,12 @@
   // str() converts minus "-" of a number to unicode "\u2212"
   value = _to-string(value).replace("−", "-").replace(" ", "")
 
-  let conf = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
-  let cbor = cbor.encode((config: conf, num: value))
-  eval(str(wasm.num(cbor)))
+  context {
+    let conf = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+
+    let cbor = cbor.encode((config: conf, num: value))
+    eval(str(wasm.num(cbor)))
+  }
 }
 
 #let add-unit(unit, shorthand, symbol, space: true) = {
@@ -73,15 +112,18 @@
 }
 
 
-#let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
+#let unit(unit, space: none, per: none) = {
   /// Format a unit.
   /// - `unit`: String containing the unit.
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
-  let conf = (space: space, space_first: "", per_mode: per)
+  unit = _to-string(unit)
+
   context {
+    let conf = _get-unit-conf(space: space, per: per, first-space: "")
     let units = _units.get()
+
     let cbor = cbor.encode((config: conf, units: units, unit: unit))
     eval(str(wasm.unit(cbor)))
   }
@@ -91,12 +133,12 @@
   value,
   unit,
   rawunit: false,
-  space: "#h(0.166667em)",
-  num-unit-space: "#h(0.166667em)",
-  multiplier: "dot",
-  thousandsep: "#h(0.166667em)",
-  decsep: ".",
-  per: "symbol",
+  space: none,
+  num-unit-space: none,
+  multiplier: none,
+  thousandsep: none,
+  decsep: none,
+  per: none,
 ) = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
@@ -109,11 +151,17 @@
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
-
-  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
-  let conf-unit = (space: space, space_first: num-unit-space, per_mode: per)
+  unit = _to-string(unit)
 
   context {
+    let first-space = num-unit-space
+    if first-space == none {
+      first-space = _config.get().at("qty").at("unit-space")
+    }
+
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
+
     let units = _units.get()
 
     let num = (config: conf-num, num: value)
@@ -127,11 +175,11 @@
 #let numrange(
   lower,
   upper,
-  multiplier: "dot",
-  delimiter: "-",
-  space: "#h(0.16667em)",
-  thousandsep: "#h(0.166667em)",
-  decsep: ".",
+  multiplier: none,
+  delimiter: none,
+  space: none,
+  thousandsep: none,
+  decsep: none,
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -139,14 +187,17 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `thousandsep`: The separator between the thousands of the float.
+
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
 
-  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
-  let conf-range = (delimiter: delimiter, space: space)
+  context {
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space)
 
-  let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
-  eval(str(wasm.numrange(cbor)))
+    let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
+    eval(str(wasm.numrange(cbor)))
+  }
 }
 
 #let qtyrange(
@@ -154,14 +205,14 @@
   upper,
   unit,
   rawunit: false,
-  multiplier: "dot",
-  delimiter: "-",
-  space: "",
-  unitspace: "#h(0.16667em)",
-  range-unit-space: "#h(0.166667em)",
-  thousandsep: "#h(0.166667em)",
-  decsep: ".",
-  per: "symbol",
+  multiplier: none,
+  delimiter: none,
+  space: none,
+  unitspace: none,
+  range-unit-space: none,
+  thousandsep: none,
+  decsep: none,
+  per: none,
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -177,12 +228,18 @@
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
-
-  let conf-num = (thousand_sep: thousandsep, dec_sep: decsep, multiplier: multiplier)
-  let conf-range = (delimiter: delimiter, space: space)
-  let conf-unit = (space: space, space_first: range-unit-space, per_mode: per)
+  unit = _to-string(unit)
 
   context {
+    let first-space = range-unit-space
+    if first-space == none {
+      first-space = _config.get().at("qty").at("unit-space")
+    }
+
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space)
+    let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
+
     let units = _units.get()
 
     let range = (config_num: conf-num, config_range: conf-range, lower: lower, upper: upper)

@@ -11,6 +11,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../units/prefixes-en.csv");
     println!("cargo:rerun-if-changed=../units/units-en.csv");
     println!("cargo:rerun-if-changed=../units/postfixes.csv");
+    println!("cargo:rerun-if-changed=../units/money.csv");
 
     let path = Path::new(&env::var("OUT_DIR").unwrap()).join("codegen_units.rs");
     let mut file = BufWriter::new(File::create(&path).unwrap());
@@ -37,10 +38,7 @@ fn prefixes(file: &mut BufWriter<File>) {
         let long = record[0].trim();
         let symbol = record[2].trim();
 
-        let val_str = format!(
-            "{:?}",
-            symbol
-        );
+        let val_str = format!("{:?}", symbol);
 
         let long = long.to_string();
         if !keys_seen.contains(&long) {
@@ -62,20 +60,21 @@ fn units(file: &mut BufWriter<File>) {
         .has_headers(false)
         .from_path("../units/units-en.csv")
         .unwrap();
+    let mut rdr_money = ReaderBuilder::new()
+        .has_headers(false)
+        .from_path("../units/money.csv")
+        .unwrap();
 
     let mut builder = Map::new();
     let mut keys_seen = HashSet::new();
 
-    for result in rdr.records() {
+    for result in rdr.records().chain(rdr_money.records()) {
         let record = result.unwrap();
         let long = record[0].trim();
         let symbol = record[2].trim();
         let space: bool = record[3].trim().parse().unwrap();
 
-        let val_str = format!(
-            "UnitSpec {{ symbol: {:?}, space: {} }}",
-            symbol, space
-        );
+        let val_str = format!("UnitSpec {{ symbol: {:?}, space: {} }}", symbol, space);
 
         let long = long.to_string();
         if !keys_seen.contains(&long) {
@@ -106,10 +105,7 @@ fn postfixes(file: &mut BufWriter<File>) {
         let long = record[0].trim();
         let symbol = record[1].trim();
 
-        let val_str = format!(
-            "{:?}",
-            symbol
-        );
+        let val_str = format!("{:?}", symbol);
 
         let long = long.to_string();
         if !keys_seen.contains(&long) {
@@ -131,20 +127,21 @@ fn units_short(file: &mut BufWriter<File>) {
         .has_headers(false)
         .from_path("../units/units-en.csv")
         .unwrap();
+    let mut rdr_money = ReaderBuilder::new()
+        .has_headers(false)
+        .from_path("../units/money.csv")
+        .unwrap();
 
     let mut builder = Map::new();
     let mut keys_seen = HashSet::new();
 
-    for result in rdr.records() {
+    for result in rdr.records().chain(rdr_money.records()) {
         let record = result.unwrap();
         let short = record[1].trim();
         let symbol = record[2].trim();
         let space: bool = record[3].trim().parse().unwrap();
 
-        let val_str = format!(
-            "UnitSpec {{ symbol: {:?}, space: {} }}",
-            symbol, space
-        );
+        let val_str = format!("UnitSpec {{ symbol: {:?}, space: {} }}", symbol, space);
 
         let short = short.to_string();
         if !keys_seen.contains(&short) {
@@ -175,10 +172,7 @@ fn prefixes_short(file: &mut BufWriter<File>) {
         let short = record[1].trim();
         let symbol = record[2].trim();
 
-        let val_str = format!(
-            "{:?}",
-            symbol
-        );
+        let val_str = format!("{:?}", symbol);
 
         let short = short.to_string();
         if !keys_seen.contains(&short) {
