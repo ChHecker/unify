@@ -42,6 +42,9 @@ pub fn numrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
     let args: TypstNumRange =
         from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
 
+    let conf_num = args.config_num;
+    let conf_range = args.config_range.try_into()?;
+
     let tokenizer_lower = NumTokenizer::new(args.lower.chars());
     let iter_lower = tokenizer_lower.peekable();
 
@@ -50,7 +53,7 @@ pub fn numrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
 
     let range = NumRange::new(iter_lower, iter_upper)?;
 
-    let range = range.to_typst(&args.config_num, &args.config_range);
+    let range = range.to_typst(&conf_num, &conf_range);
 
     Ok(range.as_bytes().to_vec())
 }
@@ -128,7 +131,7 @@ pub fn qtyrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
 
     let args_range = args.range;
     let conf_num = args_range.config_num;
-    let conf_range = args_range.config_range;
+    let conf_range = args_range.config_range.try_into()?;
 
     let tokenizer_lower = NumTokenizer::new(args_range.lower.chars());
     let iter_lower = tokenizer_lower.peekable();

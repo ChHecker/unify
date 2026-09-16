@@ -60,7 +60,7 @@
   (space: space, space_first: first-space, per_mode: per)
 }
 
-#let _get-range-conf(delimiter: none, space: none) = {
+#let _get-range-conf(delimiter: none, space: none, exppos: none) = {
   let conf = _config.get().at("range")
 
   if delimiter == none {
@@ -69,6 +69,9 @@
   if space == none {
     space = conf.at("space")
   }
+  if exppos == none {
+    exppos = conf.at("exppos")
+  }
 
-  (delimiter: delimiter, space: space)
+  (delimiter: delimiter, space: space, exp_pos: exppos)
 }

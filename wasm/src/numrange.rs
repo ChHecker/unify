@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::str::FromStr;
 
 use serde::Deserialize;
 
@@ -24,15 +25,53 @@ where
 #[derive(Debug, Deserialize)]
 pub struct TypstNumRange {
     pub config_num: NumFmtConf,
-    pub config_range: RangeFmtConf,
+    pub config_range: TypstRangeFmtConf,
     pub lower: String,
     pub upper: String,
 }
 
 #[derive(Debug, Deserialize)]
+pub struct TypstRangeFmtConf {
+    pub delimiter: Cow<'static, str>,
+    pub space: Cow<'static, str>,
+    pub exp_pos: Cow<'static, str>,
+}
+
+#[derive(Debug)]
 pub struct RangeFmtConf {
     pub delimiter: Cow<'static, str>,
     pub space: Cow<'static, str>,
+    pub exp_pos: ExpPos,
+}
+
+impl TryFrom<TypstRangeFmtConf> for RangeFmtConf {
+    type Error = String;
+
+    fn try_from(value: TypstRangeFmtConf) -> Result<Self, Self::Error> {
+        Ok(Self {
+            delimiter: value.delimiter,
+            space: value.space,
+            exp_pos: value.exp_pos.parse()?,
+        })
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ExpPos {
+    Auto,
+    Both,
+}
+
+impl FromStr for ExpPos {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "auto" => Ok(ExpPos::Auto),
+            "both" | "repeat" => Ok(ExpPos::Both),
+            s => Err(format!("invalid unit position {s}")),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -55,7 +94,8 @@ impl NumRange {
 
 impl ToTypst for NumRange {
     fn write_typst(self, buf: &mut String, conf_num: &NumFmtConf, conf_range: &RangeFmtConf) {
-        let same_exp = self.lower.exp == self.upper.exp;
+        let same_exp = matches!(conf_range.exp_pos, ExpPos::Auto)
+            && self.lower.exp == self.upper.exp;
 
         match same_exp {
             true => {
@@ -109,7 +149,7 @@ mod tests {
 
     use crate::num::NumFmtConf;
     use crate::num::lexer::Tokenizer;
-    use crate::numrange::{NumRange, RangeFmtConf, ToTypst};
+    use crate::numrange::{ExpPos, NumRange, RangeFmtConf, ToTypst};
 
     #[test]
     #[ignore]
@@ -130,6 +170,7 @@ mod tests {
         let conf_range = RangeFmtConf {
             delimiter: Cow::Borrowed("\"to\""),
             space: Cow::Borrowed("#h(0.167777em)"),
+            exp_pos: ExpPos::Auto,
         };
 
         let range = NumRange::new(iter_lower, iter_upper).unwrap();
@@ -157,6 +198,7 @@ mod tests {
         let conf_range = RangeFmtConf {
             delimiter: Cow::Borrowed("\"to\""),
             space: Cow::Borrowed("#h(0.167777em)"),
+            exp_pos: ExpPos::Auto,
         };
 
         let range = NumRange::new(iter_lower, iter_upper).unwrap();

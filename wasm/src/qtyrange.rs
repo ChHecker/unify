@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::num::{NumFmtConf, ToTypst as _};
-use crate::numrange::{NumRange, RangeFmtConf, TypstNumRange};
+use crate::numrange::{ExpPos, NumRange, RangeFmtConf, TypstNumRange};
 use crate::unit::parser::Units as PUnits;
 use crate::unit::{ToTypst as _, TypstUnit, UnitFmtConf, Units};
 
@@ -61,7 +61,8 @@ impl<'a> ToTypst for QtyRange<'a> {
     ) {
         let mut lower = self.range.lower;
         let mut upper = self.range.upper;
-        let same_exp = lower.exp == upper.exp;
+        let same_exp =
+            matches!(conf_range.exp_pos, ExpPos::Auto) && lower.exp == upper.exp;
 
         buf.push_str("lr((");
 
@@ -124,6 +125,7 @@ mod tests {
 
     use crate::num::Sign;
     use crate::num::parser::{Exponent, Float, Num};
+    use crate::numrange::ExpPos;
     use crate::unit::PerMode;
     use crate::unit::parser::Unit;
     use crate::unit::unit_lookup::UnitSpec;
@@ -182,10 +184,11 @@ mod tests {
         let conf_range = RangeFmtConf {
             delimiter: Cow::Borrowed("\"to\""),
             space: Cow::Borrowed("#h(0.167777em)"),
+            exp_pos: ExpPos::Auto,
         };
         let conf_unit = UnitFmtConf {
-            space: String::from(" "),
-            space_first: String::from(" "),
+            space: String::from(""),
+            space_first: String::from(""),
             per_mode: PerMode::Symbol,
         };
         let units_lookup = Default::default();

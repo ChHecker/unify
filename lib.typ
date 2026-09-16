@@ -28,7 +28,7 @@
 
 #let update-range-config(key, value) = {
   /// Update the formatting configuration of ranges ([`numrange`] and [`qtyrange`]).
-  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments `delimiter` and `space` to [`numrange`].
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments `delimiter`, `space`, and `exppos` to [`numrange`].
   /// - `value`: Value to set the configuration to.
 
   context {
@@ -203,6 +203,7 @@
   multiplier: none,
   delimiter: none,
   space: none,
+  exppos: none,
   thousandsep: none,
   decsep: none,
 ) = {
@@ -211,6 +212,7 @@
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
+  /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `decsep`: The separator between the integer and decimal part of the float.
 
@@ -219,7 +221,7 @@
 
   context {
     let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
-    let conf-range = _get-range-conf(delimiter: delimiter, space: space)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
 
     let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
     eval(str(format.numrange(cbor)))
@@ -234,6 +236,7 @@
   multiplier: none,
   delimiter: none,
   space: none,
+  exppos: none,
   unitspace: none,
   range-unit-space: none,
   thousandsep: none,
@@ -247,6 +250,7 @@
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
+  /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
   /// - `unitspace`: Space between units.
   /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
@@ -264,7 +268,7 @@
     }
 
     let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
-    let conf-range = _get-range-conf(delimiter: delimiter, space: space)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
     let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
 
     let units = _get-units()
