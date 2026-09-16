@@ -26,6 +26,7 @@ The Unify package supports multiple languages. Currently, the supported language
 - either (`{}` stands for a number)
     - symmetric uncertainties with `+-{}` or `±{}`
     - asymmetric uncertainties with `+{}-{}`
+    - shorthand uncertainties with `({})`
 - exponential notation `e{}`
 
 Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential.
@@ -80,8 +81,13 @@ If you think there are units not included that are of interest for other users, 
 
 
 ## `numrange`
-`numrange` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`.
+`numrange` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`. `exppos` can be used to specify how to format the exponential, with `"auto"` factoring out common exponentials and `"both"` keeping them seperate.
 
 
 ## `qtyrange`
-`qtyrange` is just a combination of `unit` and `range`. `space` is inserted between the numbers and the delimiter (equivalently to `numrange`), `unitspace` between the units (equivalently to `space` in `unit` and `qty`), and range-unit-space between the range/exponential and the units.
+`qtyrange` is just a combination of `unit` and `numrange`. `space` is inserted between the numbers and the delimiter (equivalently to `numrange`), `unitspace` between the units (equivalently to `space` in `unit` and `qty`), and `range-unit-space` between the range/exponential and the units. This also supports `exppos`. The units' positions can be specified using `unitpos`, which has three options:
+- `"factor"`: Factorizes the unit using parentheses, e.g. (2 to 4) m.
+- `"single"`: Factorizes the unit without parentheses, e.g. 2 to 4 m.
+- `"both"`: Places the unit after both numbers, e.g. 2 m to 4 m.
+
+The latter two may not be combined with `exppos` set to `auto`.
