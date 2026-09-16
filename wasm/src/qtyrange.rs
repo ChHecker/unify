@@ -157,9 +157,9 @@ impl<'a> ToTypst for QtyRange<'a> {
             false => {
                 lower.write_typst(buf, conf_num);
                 if matches!(self.unit_pos.variant, UnitPosVariants::Both) {
-                    buf.push(' ');
-                    buf.push_str(&conf_unit.space_first);
-                    buf.push(' ');
+                    // buf.push(' ');
+                    // buf.push_str(&conf_unit.space_first);
+                    // buf.push(' ');
 
                     match &self.unit {
                         RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
@@ -177,9 +177,9 @@ impl<'a> ToTypst for QtyRange<'a> {
 
                 upper.write_typst(buf, conf_num);
                 if matches!(self.unit_pos.variant, UnitPosVariants::Both) {
-                    buf.push(' ');
-                    buf.push_str(&conf_unit.space_first);
-                    buf.push(' ');
+                    // buf.push(' ');
+                    // buf.push_str(&conf_unit.space_first);
+                    // buf.push(' ');
 
                     match &self.unit {
                         RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
@@ -207,9 +207,9 @@ impl<'a> ToTypst for QtyRange<'a> {
             self.unit_pos.variant,
             UnitPosVariants::Factored | UnitPosVariants::Single
         ) {
-            buf.push(' ');
-            buf.push_str(&conf_unit.space_first);
-            buf.push(' ');
+            // buf.push(' ');
+            // buf.push_str(&conf_unit.space_first);
+            // buf.push(' ');
 
             match &self.unit {
                 RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
