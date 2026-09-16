@@ -5,10 +5,13 @@ use crate::num::{NumFmtConf, Sign, ToTypst};
 impl ToTypst for Num {
     fn write_typst(&self, buf: &mut String, config: &NumFmtConf) {
         let has_val = self.float.is_some();
-        let has_uncert = self.uncert.is_some();
         let has_exp = self.exp.is_some();
+        let uncert_needs_delim = matches!(
+            self.uncert,
+            Some(Uncertainty::Explicit(..)) | Some(Uncertainty::Asymmetric { .. })
+        );
 
-        let need_delim = has_val && has_uncert && has_exp;
+        let need_delim = has_val && has_exp && uncert_needs_delim;
         let need_multiplier = has_val && has_exp;
 
         if need_delim {
@@ -59,7 +62,7 @@ impl ToTypst for Uncertainty {
         match self {
             Uncertainty::Shorthand(int) => {
                 buf.push('(');
-                buf.push_str(&int);
+                buf.push_str(int);
                 buf.push(')');
             }
             Uncertainty::Explicit(float) => {
