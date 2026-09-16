@@ -10,5 +10,6 @@
   "num": (multiplier: "dot", thousandsep: "#h(0.166667em)", decsep: "."),
   "unit": (space: "#h(0.166667em)", per: "symbol"),
   "range": (delimiter: "-", space: "#h(0.166667em)", exppos: "auto"),
-  "qty": (unit-space: "#h(0.166667em)", rawunit: false)
+  "qty": (unit-space: "#h(0.166667em)", rawunit: false),
+  "qtyrange": (unitpos: "factor"),
 ))

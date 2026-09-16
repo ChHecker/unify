@@ -13,7 +13,7 @@ pub trait ToTypst
 where
     Self: Sized,
 {
-    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units);
+    fn write_typst(&self, buf: &mut String, conf: &UnitFmtConf, units: &Units);
 
     fn to_typst(self, conf: &UnitFmtConf, units: &Units) -> String {
         let mut buf = String::with_capacity(64);

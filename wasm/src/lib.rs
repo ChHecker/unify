@@ -4,9 +4,9 @@ use wasm_minimal_protocol::*;
 use crate::num::lexer::Tokenizer as NumTokenizer;
 use crate::num::parser::Num;
 use crate::num::{ToTypst as _, TypstNum};
-use crate::numrange::{NumRange, ToTypst as _, TypstNumRange};
+use crate::numrange::{NumRange, RangeFmtConf, ToTypst as _, TypstNumRange};
 use crate::qty::TypstQty;
-use crate::qtyrange::{QtyRange, RawUnit, ToTypst, TypstQtyRange};
+use crate::qtyrange::{QtyRange, RawUnit, ToTypst, TypstQtyRange, UnitPos};
 use crate::unit::long::lexer::Tokenizer as LongUnitTokenizer;
 use crate::unit::parser::Units;
 use crate::unit::short::lexer::Tokenizer as ShortUnitTokenizer;
@@ -131,7 +131,7 @@ pub fn qtyrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
 
     let args_range = args.range;
     let conf_num = args_range.config_num;
-    let conf_range = args_range.config_range.try_into()?;
+    let mut conf_range: RangeFmtConf = args_range.config_range.try_into()?;
 
     let tokenizer_lower = NumTokenizer::new(args_range.lower.chars());
     let iter_lower = tokenizer_lower.peekable();
@@ -159,7 +159,10 @@ pub fn qtyrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
         })
     };
 
-    let qtyrange = QtyRange { range, unit };
+    let unit_pos: UnitPos = args.unit_pos.try_into()?;
+    unit_pos.validate(&mut conf_range.exp_pos)?;
+
+    let qtyrange = QtyRange { range, unit, unit_pos };
     let qtyrange = qtyrange.to_typst(&conf_num, &conf_range, &conf_unit, &args_unit.units);
 
     Ok(qtyrange.as_bytes().to_vec())

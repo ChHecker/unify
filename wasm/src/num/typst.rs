@@ -3,7 +3,7 @@ use crate::num::parser::{Exponent, Float, Num, Uncertainty};
 use crate::num::{NumFmtConf, Sign, ToTypst};
 
 impl ToTypst for Num {
-    fn write_typst(self, buf: &mut String, config: &NumFmtConf) {
+    fn write_typst(&self, buf: &mut String, config: &NumFmtConf) {
         let has_val = self.float.is_some();
         let has_uncert = self.uncert.is_some();
         let has_exp = self.exp.is_some();
@@ -15,11 +15,11 @@ impl ToTypst for Num {
             buf.push_str("lr((");
         }
 
-        if let Some(float) = self.float {
+        if let Some(float) = &self.float {
             float.write_typst(buf, config);
         }
 
-        if let Some(uncert) = self.uncert {
+        if let Some(uncert) = &self.uncert {
             uncert.write_typst(buf, config);
         }
 
@@ -33,21 +33,21 @@ impl ToTypst for Num {
             buf.push(' ');
         }
 
-        if let Some(exp) = self.exp {
+        if let Some(exp) = &self.exp {
             exp.write_typst(buf, config);
         }
     }
 }
 
 impl ToTypst for Float {
-    fn write_typst(self, buf: &mut String, config: &NumFmtConf) {
+    fn write_typst(&self, buf: &mut String, config: &NumFmtConf) {
         if self.sign == Sign::Minus {
             buf.push('-');
         }
 
-        write_int(self.int, buf, config);
+        write_int(&self.int, buf, config);
 
-        if let Some(dec) = self.dec {
+        if let Some(dec) = &self.dec {
             buf.push_str(&config.dec_sep);
             write_dec(dec, buf, config);
         }
@@ -55,7 +55,7 @@ impl ToTypst for Float {
 }
 
 impl ToTypst for Uncertainty {
-    fn write_typst(self, buf: &mut String, config: &NumFmtConf) {
+    fn write_typst(&self, buf: &mut String, config: &NumFmtConf) {
         match self {
             Uncertainty::Shorthand(int) => {
                 buf.push('(');
@@ -66,12 +66,13 @@ impl ToTypst for Uncertainty {
                 buf.push_str(" plus.minus ");
                 float.write_typst(buf, config);
             }
-            Uncertainty::Asymmetric { plus, mut minus } => {
+            Uncertainty::Asymmetric { plus, minus } => {
                 buf.push_str("^(+");
                 plus.write_typst(buf, config);
                 buf.push(')');
 
                 buf.push_str("_(-");
+                let mut minus = minus.clone();
                 minus.sign = Sign::Plus;
                 minus.write_typst(buf, config);
                 buf.push(')');
@@ -81,17 +82,17 @@ impl ToTypst for Uncertainty {
 }
 
 impl ToTypst for Exponent {
-    fn write_typst(self, buf: &mut String, config: &NumFmtConf) {
+    fn write_typst(&self, buf: &mut String, config: &NumFmtConf) {
         buf.push_str("10^(");
         if self.sign == Sign::Minus {
             buf.push('-');
         }
-        write_int(self.int, buf, config);
+        write_int(&self.int, buf, config);
         buf.push(')');
     }
 }
 
-fn write_int(int: Integer, buf: &mut String, config: &NumFmtConf) {
+fn write_int(int: &Integer, buf: &mut String, config: &NumFmtConf) {
     let len = int.len() / 3;
     let rem = int.len() % 3;
 
@@ -103,7 +104,7 @@ fn write_int(int: Integer, buf: &mut String, config: &NumFmtConf) {
     }
 }
 
-fn write_dec(int: Integer, buf: &mut String, config: &NumFmtConf) {
+fn write_dec(int: &Integer, buf: &mut String, config: &NumFmtConf) {
     let len = int.len() / 3;
     let rem = int.len() % 3;
 
@@ -278,7 +279,7 @@ mod tests {
             dec_sep: Cow::Borrowed("."),
             multiplier: Cow::Borrowed("dot"),
         };
-        super::write_int(int, &mut text, &config);
+        super::write_int(&int, &mut text, &config);
 
         assert_eq!(&text, "1,234,567")
     }
@@ -293,7 +294,7 @@ mod tests {
             dec_sep: Cow::Borrowed("."),
             multiplier: Cow::Borrowed("dot"),
         };
-        super::write_dec(int, &mut text, &config);
+        super::write_dec(&int, &mut text, &config);
 
         assert_eq!(&text, "123,456,7")
     }

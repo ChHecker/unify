@@ -11,7 +11,7 @@ pub trait ToTypst
 where
     Self: Sized,
 {
-    fn write_typst(self, buf: &mut String, conf_num: &NumFmtConf, conf_range: &RangeFmtConf);
+    fn write_typst(&self, buf: &mut String, conf_num: &NumFmtConf, conf_range: &RangeFmtConf);
 
     fn to_typst(self, conf_num: &NumFmtConf, conf_range: &RangeFmtConf) -> String {
         let mut buf = String::with_capacity(64);
@@ -69,7 +69,7 @@ impl FromStr for ExpPos {
         match s {
             "auto" => Ok(ExpPos::Auto),
             "both" | "repeat" => Ok(ExpPos::Both),
-            s => Err(format!("invalid unit position {s}")),
+            s => Err(format!("invalid exponent position {s}")),
         }
     }
 }
@@ -93,15 +93,16 @@ impl NumRange {
 }
 
 impl ToTypst for NumRange {
-    fn write_typst(self, buf: &mut String, conf_num: &NumFmtConf, conf_range: &RangeFmtConf) {
+    fn write_typst(&self, buf: &mut String, conf_num: &NumFmtConf, conf_range: &RangeFmtConf) {
         let same_exp = matches!(conf_range.exp_pos, ExpPos::Auto)
             && self.lower.exp == self.upper.exp;
 
         match same_exp {
             true => {
-                let mut lower = self.lower;
-                let exp = lower.exp.take();
-                let mut upper = self.upper;
+                let exp = self.lower.exp.clone();
+                let mut lower = self.lower.clone();
+                lower.exp = None;
+                let mut upper = self.upper.clone();
                 upper.exp = None;
 
                 if exp.is_some() {

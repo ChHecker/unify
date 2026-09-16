@@ -6,28 +6,28 @@ use crate::result::TransposeRef;
 
 use super::Sign;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Num {
     pub float: Option<Float>,
     pub uncert: Option<Uncertainty>,
     pub exp: Option<Exponent>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Float {
     pub sign: Sign,
     pub int: Integer,
     pub dec: Option<Integer>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Uncertainty {
     Shorthand(Integer),                       // e.g. 1.23(4)
     Explicit(Float),                          // e.g. 1.23 ± 0.04
     Asymmetric { plus: Float, minus: Float }, // e.g. +0.02-0.01
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Exponent {
     pub sign: Sign,
     pub int: Integer,

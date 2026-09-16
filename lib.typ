@@ -237,6 +237,7 @@
   delimiter: none,
   space: none,
   exppos: none,
+  unitpos: none,
   unitspace: none,
   range-unit-space: none,
   thousandsep: none,
@@ -251,6 +252,8 @@
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
   /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
+  /// - `unitpos`: Whether to factor out the unit with parenthesis (`"factor"`),
+  ///   without (`"single"`), or not at all (`"both"`).
   /// - `unitspace`: Space between units.
   /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
@@ -267,6 +270,13 @@
       first-space = _config.get().at("qty").at("unit-space")
     }
 
+    let unitpos = unitpos
+    let manually-set = exppos != none
+    if unitpos == none {
+      unitpos = _config.get().at("qtyrange").at("unitpos")
+    }
+    let unitpos = (variant: unitpos, manually_set: manually-set)
+
     let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
     let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
     let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
@@ -281,7 +291,7 @@
       rawunit = _config.get().at("qty").at("rawunit")
     }
 
-    let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit))
+    let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit, unit_pos: unitpos))
     eval(str(format.qtyrange(cbor)))
   }
 }

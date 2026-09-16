@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::Deserialize;
 
 use crate::num::{NumFmtConf, ToTypst as _};
@@ -10,16 +12,82 @@ pub struct TypstQtyRange {
     pub range: TypstNumRange,
     pub unit: TypstUnit,
     pub raw_unit: bool,
+    pub unit_pos: TypstUnitPos,
 }
 
 pub struct QtyRange<'a> {
     pub range: NumRange,
     pub unit: RawUnit<'a>,
+    pub unit_pos: UnitPos,
 }
 
 pub enum RawUnit<'a> {
     Unit(PUnits<'a>),
     Raw(&'a str),
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TypstUnitPos {
+    pub variant: String,
+    pub manually_set: bool,
+}
+
+pub struct UnitPos {
+    pub variant: UnitPosVariants,
+    pub manually_set: bool,
+}
+
+impl TryFrom<TypstUnitPos> for UnitPos {
+    type Error = String;
+
+    fn try_from(value: TypstUnitPos) -> Result<Self, Self::Error> {
+        Ok(Self {
+            variant: value.variant.parse()?,
+            manually_set: value.manually_set,
+        })
+    }
+}
+
+pub enum UnitPosVariants {
+    Factored,
+    Single,
+    Both,
+}
+
+impl UnitPos {
+    pub fn validate(&self, exp_pos: &mut ExpPos) -> crate::Result<()> {
+        if !self.manually_set
+            && matches!(
+                &self.variant,
+                UnitPosVariants::Both | UnitPosVariants::Single
+            )
+        {
+            *exp_pos = ExpPos::Both;
+        }
+
+        match (&self.variant, exp_pos) {
+            (UnitPosVariants::Both, ExpPos::Auto) => Err(String::from(
+                "cannot combine unit position 'both' and exponential position 'auto'",
+            )),
+            (UnitPosVariants::Single, ExpPos::Auto) => Err(String::from(
+                "cannot combine unit position 'single' and exponential position 'auto'",
+            )),
+            _ => Ok(()),
+        }
+    }
+}
+
+impl FromStr for UnitPosVariants {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "factor" | "paren" | "bracket" => Ok(Self::Factored),
+            "single" | "outside" => Ok(Self::Single),
+            "both" | "repeat" => Ok(Self::Both),
+            s => Err(format!("invalid unit position {s}")),
+        }
+    }
 }
 
 pub trait ToTypst
@@ -61,10 +129,13 @@ impl<'a> ToTypst for QtyRange<'a> {
     ) {
         let mut lower = self.range.lower;
         let mut upper = self.range.upper;
-        let same_exp =
-            matches!(conf_range.exp_pos, ExpPos::Auto) && lower.exp == upper.exp;
+        let same_exp = matches!(conf_range.exp_pos, ExpPos::Auto)
+            && matches!(self.unit_pos.variant, UnitPosVariants::Factored)
+            && lower.exp == upper.exp;
 
-        buf.push_str("lr((");
+        if matches!(self.unit_pos.variant, UnitPosVariants::Factored) {
+            buf.push_str("lr((");
+        }
 
         let exp = match same_exp {
             true => {
@@ -85,6 +156,17 @@ impl<'a> ToTypst for QtyRange<'a> {
             }
             false => {
                 lower.write_typst(buf, conf_num);
+                if matches!(self.unit_pos.variant, UnitPosVariants::Both) {
+                    buf.push(' ');
+                    buf.push_str(&conf_unit.space_first);
+                    buf.push(' ');
+
+                    match &self.unit {
+                        RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
+                        RawUnit::Raw(unit) => buf.push_str(unit),
+                    }
+                }
+
                 buf.push(' ');
                 buf.push_str(&conf_range.space);
                 buf.push(' ');
@@ -92,29 +174,47 @@ impl<'a> ToTypst for QtyRange<'a> {
                 buf.push(' ');
                 buf.push_str(&conf_range.space);
                 buf.push(' ');
+
                 upper.write_typst(buf, conf_num);
+                if matches!(self.unit_pos.variant, UnitPosVariants::Both) {
+                    buf.push(' ');
+                    buf.push_str(&conf_unit.space_first);
+                    buf.push(' ');
+
+                    match &self.unit {
+                        RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
+                        RawUnit::Raw(unit) => buf.push_str(unit),
+                    }
+                }
 
                 None
             }
         };
 
-        buf.push_str("))");
+        if matches!(self.unit_pos.variant, UnitPosVariants::Factored) {
+            buf.push_str("))");
 
-        if let Some(exp) = exp {
-            buf.push(' ');
-            buf.push_str(&conf_num.multiplier);
-            buf.push(' ');
+            if let Some(exp) = exp {
+                buf.push(' ');
+                buf.push_str(&conf_num.multiplier);
+                buf.push(' ');
 
-            exp.write_typst(buf, conf_num);
+                exp.write_typst(buf, conf_num);
+            }
         }
 
-        buf.push(' ');
-        buf.push_str(&conf_unit.space_first);
-        buf.push(' ');
+        if matches!(
+            self.unit_pos.variant,
+            UnitPosVariants::Factored | UnitPosVariants::Single
+        ) {
+            buf.push(' ');
+            buf.push_str(&conf_unit.space_first);
+            buf.push(' ');
 
-        match self.unit {
-            RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
-            RawUnit::Raw(unit) => buf.push_str(unit),
+            match &self.unit {
+                RawUnit::Unit(unit) => unit.write_typst(buf, conf_unit, units),
+                RawUnit::Raw(unit) => buf.push_str(unit),
+            }
         }
     }
 }
@@ -174,6 +274,10 @@ mod tests {
                 }],
                 units_denom: vec![],
             }),
+            unit_pos: UnitPos {
+                variant: UnitPosVariants::Factored,
+                manually_set: false,
+            },
         };
 
         let conf_num = NumFmtConf {

@@ -3,7 +3,7 @@ use crate::unit::parser::{Exponent, Unit, Units as PUnits};
 use crate::unit::{PerMode, ToTypst, UnitFmtConf, Units};
 
 impl<'a> ToTypst for PUnits<'a> {
-    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+    fn write_typst(&self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
         let has_denom = !self.units_denom.is_empty();
 
         if (!self.units_num.is_empty() && self.units_num[0].unit.space)
@@ -23,7 +23,7 @@ impl<'a> ToTypst for PUnits<'a> {
             buf.push('1');
         }
 
-        let mut units_iter = self.units_num.into_iter();
+        let mut units_iter = self.units_num.iter();
         if let Some(unit) = units_iter.next() {
             unit.write_typst(buf, conf, units);
         }
@@ -54,7 +54,7 @@ impl<'a> ToTypst for PUnits<'a> {
                 }
             };
 
-            let mut units_iter = self.units_denom.into_iter();
+            let mut units_iter = self.units_denom.iter();
             if let Some(unit) = units_iter.next() {
                 unit.write_typst(buf, conf, units);
             }
@@ -73,7 +73,7 @@ impl<'a> ToTypst for PUnits<'a> {
 }
 
 impl<'a> ToTypst for Unit<'a> {
-    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
+    fn write_typst(&self, buf: &mut String, conf: &UnitFmtConf, units: &Units) {
         if self.sqrt {
             buf.push_str("sqrt(");
         }
@@ -84,7 +84,7 @@ impl<'a> ToTypst for Unit<'a> {
 
         buf.push_str(self.unit.symbol);
 
-        if let Some(exp) = self.exp {
+        if let Some(exp) = &self.exp {
             exp.write_typst(buf, conf, units);
         }
 
@@ -95,7 +95,7 @@ impl<'a> ToTypst for Unit<'a> {
 }
 
 impl ToTypst for Exponent {
-    fn write_typst(self, buf: &mut String, conf: &UnitFmtConf, _units: &Units) {
+    fn write_typst(&self, buf: &mut String, conf: &UnitFmtConf, _units: &Units) {
         if (conf.per_mode != PerMode::Symbol) && &self.num == "1" && self.denom.is_none() {
             return;
         }
@@ -108,7 +108,7 @@ impl ToTypst for Exponent {
 
         buf.push_str(&self.num);
 
-        if let Some(denom) = self.denom {
+        if let Some(denom) = &self.denom {
             buf.push_str("\\/");
             buf.push_str(&denom);
         }
