@@ -110,7 +110,7 @@ impl ToTypst for Exponent {
 
         if let Some(denom) = &self.denom {
             buf.push_str("\\/");
-            buf.push_str(&denom);
+            buf.push_str(denom);
         }
 
         buf.push(')');

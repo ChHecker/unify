@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 pub type Result<T> = core::result::Result<T, String>;
 
 /// A utility trait in order to turn Option<Result<...>>
