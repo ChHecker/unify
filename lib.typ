@@ -52,6 +52,19 @@
   }
 }
 
+#let update-qtyrange-config(key, value) = {
+  /// Update the formatting configuration of [`qtyrange`].
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `unitpos`.
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("qtyrange").at(key) = value
+      conf
+    })
+  }
+}
+
 #let num(value, multiplier: none, thousandsep: none, decsep: none) = {
   /// Format a number.
   /// - `value`: String with the number.
