@@ -85,7 +85,7 @@ pub fn unit(arg: &[u8]) -> crate::Result<Vec<u8>> {
 #[wasm_func]
 pub fn qty(arg: &[u8]) -> crate::Result<Vec<u8>> {
     let args: TypstQty = from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
-    let mut out = String::from('$');
+    let mut out = String::new();
 
     let args_num = args.num;
     let conf_num = args_num.config;
@@ -120,7 +120,6 @@ pub fn qty(arg: &[u8]) -> crate::Result<Vec<u8>> {
         units.write_typst(&mut out, &conf_unit, &args_unit.units);
     }
 
-    out.push('$');
     Ok(out.as_bytes().to_vec())
 }
 

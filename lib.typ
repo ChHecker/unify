@@ -1,5 +1,18 @@
 #import "utils.typ": *
 
+#let update-global-config(key, value) = {
+  /// Update the formatting configuration for all unify function.
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `mode`.
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("global").at(key) = value
+      conf
+    })
+  }
+}
+
 #let update-num-config(key, value) = {
   /// Update the formatting configuration of numbers.
   /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`num`].
@@ -65,12 +78,13 @@
   }
 }
 
-#let num(value, multiplier: none, thousandsep: none, decsep: none) = {
+#let num(value, multiplier: none, thousandsep: none, decsep: none, mode: none) = {
   /// Format a number.
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `decsep`: The separator between the integer and decimal part of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   // str() converts minus "-" of a number to unicode "\u2212"
   value = _to-string(value).replace("−", "-").replace(" ", "")
@@ -79,7 +93,7 @@
     let conf = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
 
     let cbor = cbor.encode((config: conf, num: value))
-    eval(str(format.num(cbor)))
+    _display-math(str(format.num(cbor)), mode)
   }
 }
 
@@ -144,11 +158,12 @@
   }
 }
 
-#let unit(unit, space: none, per: none) = {
+#let unit(unit, space: none, per: none, mode: none) = {
   /// Format a unit.
   /// - `unit`: String containing the unit.
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   unit = _to-string(unit)
 
@@ -157,7 +172,7 @@
     let units = _get-units()
 
     let cbor = cbor.encode((config: conf, units: units, unit: unit))
-    eval(str(format.unit(cbor)))
+    _display-math(str(format.unit(cbor)), mode)
   }
 }
 
@@ -171,6 +186,7 @@
   thousandsep: none,
   decsep: none,
   per: none,
+  mode: none,
 ) = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
@@ -182,6 +198,7 @@
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
   unit = _to-string(unit)
@@ -206,7 +223,7 @@
     }
 
     let cbor = cbor.encode((num: num, unit: unit, raw_unit: rawunit))
-    eval(str(format.qty(cbor)))
+    _display-math(str(format.qty(cbor)), mode)
   }
 }
 
@@ -219,6 +236,7 @@
   exppos: none,
   thousandsep: none,
   decsep: none,
+  mode: none,
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -228,6 +246,7 @@
   /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `decsep`: The separator between the integer and decimal part of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
@@ -237,7 +256,7 @@
     let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
 
     let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
-    eval(str(format.numrange(cbor)))
+    _display-math(str(format.numrange(cbor)), mode)
   }
 }
 
@@ -256,6 +275,7 @@
   thousandsep: none,
   decsep: none,
   per: none,
+  mode: none,
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -272,6 +292,7 @@
   /// - `thousandsep`: The separator between the thousands of the float.
   /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
@@ -305,6 +326,6 @@
     }
 
     let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit, unit_pos: unitpos))
-    eval(str(format.qtyrange(cbor)))
+    _display-math(str(format.qtyrange(cbor)), mode)
   }
 }

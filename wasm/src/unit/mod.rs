@@ -17,9 +17,7 @@ where
 
     fn to_typst(self, conf: &UnitFmtConf, units: &Units) -> String {
         let mut buf = String::with_capacity(64);
-        buf.push('$');
         self.write_typst(&mut buf, conf, units);
-        buf.push('$');
         buf
     }
 }

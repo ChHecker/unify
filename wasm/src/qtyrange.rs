@@ -111,9 +111,7 @@ where
         units: &Units,
     ) -> String {
         let mut buf = String::with_capacity(64);
-        buf.push('$');
         self.write_typst(&mut buf, conf_num, conf_range, conf_unit, units);
-        buf.push('$');
         buf
     }
 }

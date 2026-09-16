@@ -18,6 +18,28 @@
   }
 }
 
+#let _display-math(formatted, mode) = {
+  /// Evaluate a formatted math string and display it.
+  /// - `formatted`: Math string to evaluate (without the surrounding `$`).
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
+
+  if mode == none {
+    mode = _config.get().at("global").at("mode")
+  }
+
+  if mode == "math" {
+    eval("$" + formatted + "$")
+  } else if mode == "text" {
+    // Change the font of the glyphs (`math.text`) but keep the math font
+    // for layout so that scripts, fractions, and delimiters are positioned correctly.
+    show math.text: set text(font: text.font, weight: text.weight)
+    eval("$" + formatted + "$")
+  } else {
+    panic("invalid mode: " + mode)
+  }
+}
+
+
 #let _get-units() = {
   let units = _units.get()
   units.insert("lang", text.lang)

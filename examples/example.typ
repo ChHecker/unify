@@ -18,9 +18,13 @@ Changing default arguments to the functions:
 #update-num-config("decsep", ",")
 #update-num-config("thousandsep", ".")
 $ num("-1.32865+-0.50273e-6") $
-
 #update-num-config("decsep", ".")
 #update-num-config("thousandsep", "#h(0.166667em)")
+
+#text(font: "Arial")[
+  Rendering with a differing text font with `mode "text"`:
+  #align(center, qty("2.99792458e8", "m/s", mode: "text"))
+]
 #set text(lang: "ru")
 Работа пакета с русскими символами:
 $ num("-1.32865+-0.50273e-6") $

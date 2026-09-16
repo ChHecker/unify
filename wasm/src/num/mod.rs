@@ -15,9 +15,7 @@ where
 
     fn to_typst(self, conf: &NumFmtConf) -> String {
         let mut buf = String::with_capacity(64);
-        buf.push('$');
         self.write_typst(&mut buf, conf);
-        buf.push('$');
         buf
     }
 }
