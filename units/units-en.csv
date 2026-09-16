@@ -3,7 +3,7 @@ metre,m,upright("m"),true
 lightyear,ly,upright("ly"),true
 parsec,pc,upright("pc"),true
 astronomicalunit,au,upright("au"),true
-angstrom,A,upright("Å"),true
+angstrom,Ang,upright("Å"),true
 hectare,ha,upright("ha"),true
 barn,b,upright("b"),true
 litre,l,upright("l"),true
