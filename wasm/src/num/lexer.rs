@@ -34,6 +34,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
                 _ => Token::Sign(Sign::Plus),
             },
             '-' => Token::Sign(Sign::Minus),
+            '±' => Token::PlusMinus,
             '(' => Token::ParenOpen,
             ')' => Token::ParenClose,
             'e' => Token::Exp,
