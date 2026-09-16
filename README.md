@@ -61,16 +61,7 @@ The shorthand notation also has four parts:
 Note: Use `u` for micro.
 
 ### Adding units
-#### Compile time
-The included units, prefixes, and postfixes are compiled into the WASM binary at compile time from `units/prefixes_xx.csv`, `units/units_xx.csv`, and `units/postfixes_xx.csv` (in the library directory, where `xx` is the language). You can add you own units etc. by appending them to these files, and recompiling the Rust crate in `wasm` and moving the output `WASM` to `format.wasm`:
-```bash
-cd wasm
-cargo build --release --target wasm32-unknown-unknown
-cp target/wasm32-unknown-unknown/release/unify.wasm ../format.wasm
-```
-
-#### Runtime
-At runtime, units can be added using `add-unit`, `add-prefix`, and `add-postfix`, respectively. The formats for the pre- and postfixes are:
+The formats for pre- and postfixes are:
 
 | pre-/postfix | shorthand | symbol       |
 | ------------ | --------- | ------------ |
@@ -82,8 +73,13 @@ and for units:
 | ----- | --------- | ------------ | ----- |
 | meter | m         | upright("m") | true  |
 
-The first column specifies the written-out word, the second one the shorthand. These should be unique. The third column represents the string that will be inserted as the unit symbol. For units, the last column describes whether there should be space before the unit (possible values: `true`/`false`, `1`,`0`). This is mostly the cases for degrees and other angle units (e.g. arcseconds).  
-If you think there are units not included that are of interest for other users, you can create an issue or PR.
+The first column specifies the written-out word, the second one the shorthand. These should be unique. The third column represents the string that will be inserted as the unit symbol. For units, the last column describes whether there should be space before the unit (possible values: `true`/`false`, `1`,`0`). This is mostly the cases for degrees and other angle units (e.g. arcseconds).
+
+#### Compile time
+The included units, prefixes, and postfixes are compiled into the WASM binary at compile time from `units/prefixes_xx.csv`, `units/units_xx.csv`, and `units/postfixes_xx.csv` (in the library directory, where `xx` is the language). You can add you own units etc. by appending them to these files, and recompiling the Rust crate using `build_wasm.sh`. If you think there are units not included that are of interest for other users, you can create an issue or PR.
+
+#### Runtime
+At runtime, units can be added using `add-unit`, `add-prefix`, and `add-postfix`, respectively.   
 
 
 ## `qty`
