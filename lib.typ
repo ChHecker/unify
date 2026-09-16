@@ -1,39 +1,100 @@
-#import "format.typ": *
+#import "utils.typ": *
 
-#let num(value, multiplier: "dot", thousandsep: "#h(0.166667em)") = {
+#let update-global-config(key, value) = {
+  /// Update the formatting configuration for all unify function.
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `mode`.
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("global").at(key) = value
+      conf
+    })
+  }
+}
+
+#let update-num-config(key, value) = {
+  /// Update the formatting configuration of numbers.
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`num`].
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("num").at(key) = value
+      conf
+    })
+  }
+}
+
+#let update-unit-config(key, value) = {
+  /// Update the formatting configuration of units.
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments to [`unit`].
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("unit").at(key) = value
+      conf
+    })
+  }
+}
+
+#let update-range-config(key, value) = {
+  /// Update the formatting configuration of ranges ([`numrange`] and [`qtyrange`]).
+  /// - `key`: Keys of the configuration to change. Possible values are the keyword arguments `delimiter`, `space`, and `exppos` to [`numrange`].
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("range").at(key) = value
+      conf
+    })
+  }
+}
+
+#let update-qty-config(key, value) = {
+  /// Update the formatting configuration of quantities ([`qty`] and [`qtyrange`]).
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `unit-space` and `rawunit`.
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("qty").at(key) = value
+      conf
+    })
+  }
+}
+
+#let update-qtyrange-config(key, value) = {
+  /// Update the formatting configuration of [`qtyrange`].
+  /// - `key`: Keys of the configuration to change. Currently, this can only be `unitpos`.
+  /// - `value`: Value to set the configuration to.
+
+  context {
+    _config.update(conf => {
+      conf.at("qtyrange").at(key) = value
+      conf
+    })
+  }
+}
+
+#let num(value, multiplier: none, thousandsep: none, decsep: none, mode: none) = {
   /// Format a number.
   /// - `value`: String with the number.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   // str() converts minus "-" of a number to unicode "\u2212"
-  value = _to-string(value).replace("−", "-").replace(" ", "") //.replace(",", ".")
+  value = _to-string(value).replace("−", "-").replace(" ", "")
 
-  let match-value = value.match(_re-num)
-  assert.ne(match-value, none, message: "invalid number: " + value)
-  let captures-value = match-value.captures
+  context {
+    let conf = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
 
-  let upper = none
-  let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
-    lower = none
-  } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
+    let cbor = cbor.encode((config: conf, num: value))
+    _display-math(str(format.num(cbor)), mode)
   }
-
-  let formatted = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
-    upper: upper,
-    lower: lower,
-    multiplier: multiplier,
-    thousandsep: thousandsep,
-  )
-
-  formatted = "$" + formatted + "$"
-  eval(formatted)
 }
 
 #let add-unit(unit, shorthand, symbol, space: true) = {
@@ -42,15 +103,18 @@
   /// - `shorthand`: Shorthand of the unit, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the unit symbol.
   /// - `space`: Whether to put a space before the unit.
-  context {
-    let lang = _get-language()
 
-    _lang-db.update(db => {
-      db.at(lang).at("units").at(0).insert(unit, symbol)
-      db.at(lang).at("units").at(1).insert(shorthand, symbol)
-      db.at(lang).at("units").at(2).insert(unit, space)
-      db.at(lang).at("units").at(3).insert(shorthand, space)
-      db
+  context {
+    _units.update(units => {
+      units
+        .at("units")
+        .push((
+          long: unit,
+          short: shorthand,
+          symbol: symbol,
+          space: space,
+        ))
+      units
     })
   }
 }
@@ -60,42 +124,69 @@
   /// - `prefix`: Full name of the prefix.
   /// - `shorthand`: Shorthand of the prefix, usually only 1-2 letters.
   /// - `symbol`: String that will be inserted as the prefix symbol.
-  context {
-    let lang = _get-language()
 
-    _lang-db.update(db => {
-      db.at(lang).at("prefixes").at(0).insert(prefix, symbol)
-      db.at(lang).at("prefixes").at(1).insert(shorthand, symbol)
-      db
+  context {
+    _units.update(units => {
+      units
+        .at("prefixes")
+        .push((
+          long: prefix,
+          short: shorthand,
+          symbol: symbol,
+        ))
+      units
     })
   }
 }
 
+#let add-postfix(postfix, symbol) = {
+  /// Add a new postfix.
+  /// - `postfix`: Full name of the postfix.
+  /// - `shorthand`: Shorthand of the postfix, usually only 1-2 letters.
+  /// - `symbol`: String that will be inserted as the postfix symbol.
 
-#let unit(unit, space: "#h(0.166667em)", per: "symbol") = {
+  context {
+    _units.update(units => {
+      units
+        .at("postfixes")
+        .push((
+          long: postfix,
+          symbol: symbol,
+        ))
+      units
+    })
+  }
+}
+
+#let unit(unit, space: none, per: none, mode: none) = {
   /// Format a unit.
   /// - `unit`: String containing the unit.
   /// - `space`: Space between units.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
+
+  unit = _to-string(unit)
 
   context {
-    let formatted-unit = ""
-    formatted-unit = _format-unit(unit, space: space, first-space: "", per: per)
+    let conf = _get-unit-conf(space: space, per: per, first-space: "")
+    let units = _get-units()
 
-    let formatted = "$" + formatted-unit + "$"
-    eval(formatted)
+    let cbor = cbor.encode((config: conf, units: units, unit: unit))
+    _display-math(str(format.unit(cbor)), mode)
   }
 }
 
 #let qty(
   value,
   unit,
-  rawunit: false,
-  space: "#h(0.166667em)",
-  num-unit-space: "#h(0.166667em)",
-  multiplier: "dot",
-  thousandsep: "#h(0.166667em)",
-  per: "symbol",
+  rawunit: none,
+  space: none,
+  num-unit-space: none,
+  multiplier: none,
+  thousandsep: none,
+  decsep: none,
+  per: none,
+  mode: none,
 ) = {
   /// Format a quantity (i.e. number with a unit).
   /// - `value`: String containing the number.
@@ -105,96 +196,86 @@
   /// - `space`: Space between units.
   /// - `num-unit-space`: Space between the number and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   value = _to-string(value).replace("−", "-").replace(" ", "")
-  let match-value = value.match(_re-num)
-  assert.ne(match-value, none, message: "invalid number: " + value)
-  let captures-value = match-value.captures
-
-  let upper = none
-  let lower = none
-  if captures-value.at(15) != none {
-    upper = captures-value.at(15)
-    lower = none
-  } else {
-    upper = captures-value.at(5)
-    lower = captures-value.at(7)
-  }
-
-  let formatted-value = _format-num(
-    captures-value.at(0),
-    exponent: captures-value.at(19),
-    upper: upper,
-    lower: lower,
-    multiplier: multiplier,
-    thousandsep: thousandsep,
-  )
+  unit = _to-string(unit)
 
   context {
-    let formatted-unit = ""
-    if rawunit {
-      formatted-unit = space + unit
-    } else {
-      formatted-unit = _format-unit(unit, space: space, first-space: num-unit-space, per: per)
+    let first-space = num-unit-space
+    if first-space == none {
+      first-space = _config.get().at("qty").at("unit-space")
     }
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
+
+    let units = _get-units()
+
+    let num = (config: conf-num, num: value)
+    let unit = (config: conf-unit, units: units, unit: unit)
+
+    let rawunit = rawunit
+    if rawunit == none {
+      rawunit = _config.get().at("qty").at("rawunit")
+    }
+
+    let cbor = cbor.encode((num: num, unit: unit, raw_unit: rawunit))
+    _display-math(str(format.qty(cbor)), mode)
   }
 }
 
 #let numrange(
   lower,
   upper,
-  multiplier: "dot",
-  delimiter: "-",
-  space: "#h(0.16667em)",
-  thousandsep: "#h(0.166667em)",
+  multiplier: none,
+  delimiter: none,
+  space: none,
+  exppos: none,
+  thousandsep: none,
+  decsep: none,
+  mode: none,
 ) = {
   /// Format a range.
   /// - `(lower, upper)`: Strings containing the numbers.
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
+  /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
+
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
-  let match-lower = lower.match(_re-num)
-  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
-  let captures-lower = match-lower.captures
-
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
-  let match-upper = upper.match(_re-num)
-  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
-  let captures-upper = match-upper.captures
 
-  let formatted = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
-    multiplier: multiplier,
-    delimiter: delimiter,
-    thousandsep: thousandsep,
-    space: space,
-  )
-  formatted = "$" + formatted + "$"
+  context {
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
 
-  eval(formatted)
+    let cbor = cbor.encode((config_num: conf-num, config_range: conf-range, lower: lower, upper: upper))
+    _display-math(str(format.numrange(cbor)), mode)
+  }
 }
 
 #let qtyrange(
   lower,
   upper,
   unit,
-  rawunit: false,
-  multiplier: "dot",
-  delimiter: "-",
-  space: "",
-  unitspace: "#h(0.16667em)",
-  range-unit-space: "#h(0.166667em)",
-  thousandsep: "#h(0.166667em)",
-  per: "symbol",
+  rawunit: none,
+  multiplier: none,
+  delimiter: none,
+  space: none,
+  exppos: none,
+  unitpos: none,
+  unitspace: none,
+  range-unit-space: none,
+  thousandsep: none,
+  decsep: none,
+  per: none,
+  mode: none,
 ) = {
   /// Format a range with a unit.
   /// - `(lower, upper)`: Strings containing the numbers.
@@ -203,42 +284,48 @@
   /// - `multiplier`: The symbol used to indicate multiplication
   /// - `delimiter`: Symbol between the numbers.
   /// - `space`: Space between the numbers and the delimiter.
+  /// - `exppos`: Whether to factor out common exponents (`"auto"`) or not (`"both"`).
+  /// - `unitpos`: Whether to factor out the unit with parenthesis (`"factor"`),
+  ///   without (`"single"`), or not at all (`"both"`).
   /// - `unitspace`: Space between units.
   /// - `range-unit-space`: Space between the range/exponential and the units.
   /// - `thousandsep`: The separator between the thousands of the float.
+  /// - `decsep`: The separator between the integer and decimal part of the float.
   /// - `per`: Whether to format the units after `per` or `/` with a fraction or exponent.
+  /// - `mode`: Whether to render in the math font (`"math"`) or in the surrounding document font (`"text"`).
 
   lower = _to-string(lower).replace("−", "-").replace(" ", "")
-  let match-lower = lower.match(_re-num)
-  assert.ne(match-lower, none, message: "invalid lower number: " + lower)
-  let captures-lower = match-lower.captures
-
   upper = _to-string(upper).replace("−", "-").replace(" ", "")
-  let match-upper = upper.match(_re-num)
-  assert.ne(match-upper, none, message: "invalid upper number: " + upper)
-  let captures-upper = match-upper.captures
-
-  let formatted-value = _format-range(
-    captures-lower.at(0),
-    captures-upper.at(0),
-    exponent-lower: captures-lower.at(19),
-    exponent-upper: captures-upper.at(19),
-    multiplier: multiplier,
-    delimiter: delimiter,
-    space: space,
-    thousandsep: thousandsep,
-    force-parentheses: true,
-  )
+  unit = _to-string(unit)
 
   context {
-    let formatted-unit = ""
-    if rawunit {
-      formatted-unit = space + unit
-    } else {
-      formatted-unit = _format-unit(unit, space: unitspace, first-space: range-unit-space, per: per)
+    let first-space = range-unit-space
+    if first-space == none {
+      first-space = _config.get().at("qty").at("unit-space")
     }
 
-    let formatted = "$" + formatted-value + formatted-unit + "$"
-    eval(formatted)
+    let unitpos = unitpos
+    let manually-set = exppos != none
+    if unitpos == none {
+      unitpos = _config.get().at("qtyrange").at("unitpos")
+    }
+    let unitpos = (variant: unitpos, manually_set: manually-set)
+
+    let conf-num = _get-num-conf(thousandsep: thousandsep, decsep: decsep, multiplier: multiplier)
+    let conf-range = _get-range-conf(delimiter: delimiter, space: space, exppos: exppos)
+    let conf-unit = _get-unit-conf(space: space, per: per, first-space: first-space)
+
+    let units = _get-units()
+
+    let range = (config_num: conf-num, config_range: conf-range, lower: lower, upper: upper)
+    let unit = (config: conf-unit, units: units, unit: unit)
+
+    let rawunit = rawunit
+    if rawunit == none {
+      rawunit = _config.get().at("qty").at("rawunit")
+    }
+
+    let cbor = cbor.encode((range: range, unit: unit, raw_unit: rawunit, unit_pos: unitpos))
+    _display-math(str(format.qtyrange(cbor)), mode)
   }
 }
