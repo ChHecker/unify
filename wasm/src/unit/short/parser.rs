@@ -78,7 +78,12 @@ impl<'a> Unit<'a> {
             let mut prefix = None;
             let mut unit = None;
 
-            for (i, _) in text.char_indices() {
+            let indices = text
+                .char_indices()
+                .map(|x| x.0)
+                .skip(1) // skip 0th index
+                .chain([text.len()]); // add last char
+            for i in indices {
                 let prefix_cur = &text[..i];
                 if let Some(prefix_cur) = units_lookup.get_prefix_short(prefix_cur) {
                     prefix = Some(prefix_cur);
