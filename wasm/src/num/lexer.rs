@@ -53,7 +53,7 @@ impl<I: Iterator<Item = char>> Iterator for Tokenizer<I> {
                 }
                 Token::Int(int)
             }
-            c => return Some(Err(format!("unexpected token '{}'", c))),
+            c => return Some(Err(format!("unexpected token '{}'", c).into())),
         }))
     }
 }

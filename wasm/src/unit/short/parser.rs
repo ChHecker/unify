@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::iter::Peekable;
 
 use crate::num::Sign;
@@ -23,7 +24,7 @@ impl<'a> Units<'a> {
                     iter.next();
                     units.push(Unit::short(&mut iter, units_lookup, true)?);
                 }
-                t => return Err(format!("unexpected token '{t}'")),
+                t => return Err(format!("unexpected token '{t}'").into()),
             }
         }
 
@@ -37,8 +38,8 @@ impl<'a> Units<'a> {
         }
 
         let units = Self {
-            units_num,
-            units_denom,
+            units_num: units_num.into_boxed_slice(),
+            units_denom: units_denom.into_boxed_slice(),
         };
         units.validate()?;
 
@@ -58,18 +59,18 @@ impl<'a> Unit<'a> {
             Some(Token::Unit(unit)) => unit,
             Some(Token::Sqrt) => {
                 if !matches!(iter.next().transpose()?, Some(Token::ParenOpen)) {
-                    return Err(String::from("expected `(` after sqrt"));
+                    return Err(Cow::from("expected `(` after sqrt"));
                 }
                 let unit = match iter.next().transpose()? {
                     Some(Token::Unit(unit)) => unit,
-                    Some(t) => return Err(format!("unexpected token '{t}'")),
-                    None => return Err(String::from("invalid unit")),
+                    Some(t) => return Err(format!("unexpected token '{t}'").into()),
+                    None => return Err(Cow::from("invalid unit")),
                 };
                 sqrt = true;
                 unit
             }
-            Some(t) => return Err(format!("unexpected token '{t}'")),
-            None => return Err(String::from("invalid unit")),
+            Some(t) => return Err(format!("unexpected token '{t}'").into()),
+            None => return Err(Cow::from("invalid unit")),
         };
 
         let (prefix, unit) = if let Some(unit) = units_lookup.get_unit_short(&text) {
@@ -89,14 +90,14 @@ impl<'a> Unit<'a> {
                     prefix = Some(prefix_cur);
                     match units_lookup.get_unit_short(&text[i..]) {
                         Some(unit_cur) => unit = Some(unit_cur),
-                        None => return Err(format!("invalid unit '{}'", &text[i..])),
+                        None => return Err(format!("invalid unit '{}'", &text[i..]).into()),
                     }
                 }
             }
 
             match (prefix, unit) {
                 (Some(prefix), Some(unit)) => (Some(prefix), unit),
-                _ => return Err(format!("invalid unit '{text}'")),
+                _ => return Err(format!("invalid unit '{text}'").into()),
             }
         };
 
@@ -110,7 +111,7 @@ impl<'a> Unit<'a> {
         };
 
         if sqrt && !matches!(iter.next().transpose()?, Some(Token::ParenClose)) {
-            return Err(String::from("expected `)`"));
+            return Err(Cow::from("expected `)`"));
         }
 
         if per {
@@ -118,7 +119,7 @@ impl<'a> Unit<'a> {
                 Some(exp) => match exp.sign {
                     Sign::Plus => exp.sign = Sign::Minus,
                     Sign::Minus => {
-                        return Err(String::from("cannot combine / and negative exponents"));
+                        return Err(Cow::from("cannot combine / and negative exponents"));
                     }
                 },
                 None => {
@@ -153,8 +154,8 @@ impl Exponent {
             Some(Token::Sign(sign)) => {
                 let num = match iter.next().transpose()? {
                     Some(Token::Number(num)) => num,
-                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
-                    None => return Err(String::from("invalid exponent")),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent").into()),
+                    None => return Err(Cow::from("invalid exponent")),
                 };
 
                 Self {
@@ -175,8 +176,8 @@ impl Exponent {
 
                 let num = match iter.next().transpose()? {
                     Some(Token::Number(num)) => num,
-                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
-                    None => return Err(String::from("invalid exponent")),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent").into()),
+                    None => return Err(Cow::from("invalid exponent")),
                 };
 
                 let denom = match iter.peek().transpose()? {
@@ -185,8 +186,8 @@ impl Exponent {
 
                         match iter.next().transpose()? {
                             Some(Token::Number(num)) => Some(num),
-                            Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
-                            None => return Err(String::from("invalid exponent")),
+                            Some(t) => return Err(format!("unexpected token '{t}' in exponent").into()),
+                            None => return Err(Cow::from("invalid exponent")),
                         }
                     }
                     _ => None,
@@ -194,8 +195,8 @@ impl Exponent {
 
                 match iter.next().transpose()? {
                     Some(Token::ParenClose) => (),
-                    Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
-                    None => return Err(String::from("invalid exponent")),
+                    Some(t) => return Err(format!("unexpected token '{t}' in exponent").into()),
+                    None => return Err(Cow::from("invalid exponent")),
                 }
 
                 Self { sign, num, denom }
@@ -222,7 +223,7 @@ impl Exponent {
                     num.push(c);
                 }
                 if num.is_empty() {
-                    return Err(String::from("exponent sign without number"));
+                    return Err(Cow::from("exponent sign without number"));
                 }
 
                 Self {
@@ -231,8 +232,8 @@ impl Exponent {
                     denom: None,
                 }
             }
-            Some(t) => return Err(format!("unexpected token '{t}' in exponent")),
-            None => return Err(String::from("invalid exponent")),
+            Some(t) => return Err(format!("unexpected token '{t}' in exponent").into()),
+            None => return Err(Cow::from("invalid exponent")),
         })
     }
 }
@@ -259,7 +260,7 @@ mod tests {
         assert_eq!(
             units,
             Ok(Units {
-                units_num: vec![
+                units_num: Box::new([
                     Unit {
                         prefix: Some(kilo),
                         unit: gram,
@@ -276,8 +277,8 @@ mod tests {
                         exp: None,
                         sqrt: true
                     }
-                ],
-                units_denom: vec![Unit {
+                ]),
+                units_denom: Box::new([Unit {
                     prefix: None,
                     unit: second,
                     exp: Some(Exponent {
@@ -286,7 +287,7 @@ mod tests {
                         denom: None
                     }),
                     sqrt: false
-                }]
+                }])
             })
         )
     }

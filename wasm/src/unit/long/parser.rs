@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::iter::Peekable;
 
 use crate::num::Sign;
@@ -34,8 +35,8 @@ impl<'a> Units<'a> {
         }
 
         let units = Self {
-            units_num,
-            units_denom,
+            units_num: units_num.into_boxed_slice(),
+            units_denom: units_denom.into_boxed_slice(),
         };
         units.validate()?;
 
@@ -51,8 +52,8 @@ impl<'a> Unit<'a> {
     ) -> crate::Result<Self> {
         let text = match iter.next().transpose()? {
             Some(Token::Unit(text)) => text,
-            Some(t) => return Err(format!("unexpected token '{t}'")),
-            _ => return Err(String::from("invalid token")),
+            Some(t) => return Err(format!("unexpected token '{t}'").into()),
+            _ => return Err(Cow::from("invalid token")),
         };
 
         let prefix = units_lookup.get_prefix(&text);
@@ -60,8 +61,8 @@ impl<'a> Unit<'a> {
             Some(_) => {
                 let text = match iter.next().transpose()? {
                     Some(Token::Unit(text)) => text,
-                    Some(t) => return Err(format!("unexpected token '{t}'")),
-                    _ => return Err(String::from("invalid token")),
+                    Some(t) => return Err(format!("unexpected token '{t}'").into()),
+                    _ => return Err(Cow::from("invalid token")),
                 };
                 units_lookup
                     .get_unit(&text)
@@ -92,7 +93,7 @@ impl<'a> Unit<'a> {
                 Some(exp) => match exp.sign {
                     Sign::Plus => exp.sign = Sign::Minus,
                     Sign::Minus => {
-                        return Err(String::from("cannot combine / and negative exponents"));
+                        return Err(Cow::from("cannot combine / and negative exponents"));
                     }
                 },
                 None => {
@@ -135,13 +136,13 @@ mod tests {
         assert_eq!(
             units,
             Ok(Units {
-                units_num: vec![Unit {
+                units_num: Box::new([Unit {
                     prefix: Some(kilo),
                     unit: gram,
                     exp: None,
                     sqrt: false
-                }],
-                units_denom: vec![Unit {
+                }]),
+                units_denom: Box::new([Unit {
                     prefix: None,
                     unit: meter,
                     exp: Some(Exponent {
@@ -150,7 +151,7 @@ mod tests {
                         denom: None,
                     }),
                     sqrt: false
-                }]
+                }])
             })
         )
     }

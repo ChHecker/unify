@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use serde::Deserialize;
@@ -66,10 +67,10 @@ impl UnitPos {
         }
 
         match (&self.variant, exp_pos) {
-            (UnitPosVariants::Both, ExpPos::Auto) => Err(String::from(
+            (UnitPosVariants::Both, ExpPos::Auto) => Err(Cow::from(
                 "cannot combine unit position 'both' and exponential position 'auto'",
             )),
-            (UnitPosVariants::Single, ExpPos::Auto) => Err(String::from(
+            (UnitPosVariants::Single, ExpPos::Auto) => Err(Cow::from(
                 "cannot combine unit position 'single' and exponential position 'auto'",
             )),
             _ => Ok(()),
@@ -261,7 +262,7 @@ mod tests {
                 },
             },
             unit: RawUnit::Unit(PUnits {
-                units_num: vec![Unit {
+                units_num: Box::new([Unit {
                     prefix: None,
                     unit: UnitSpec {
                         symbol: "m",
@@ -269,8 +270,8 @@ mod tests {
                     },
                     exp: None,
                     sqrt: false,
-                }],
-                units_denom: vec![],
+                }]),
+                units_denom: Box::new([]),
             }),
             unit_pos: UnitPos {
                 variant: UnitPosVariants::Factored,
@@ -279,13 +280,13 @@ mod tests {
         };
 
         let conf_num = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         let conf_range = RangeFmtConf {
-            delimiter: Cow::Borrowed("\"to\""),
-            space: Cow::Borrowed("#h(0.167777em)"),
+            delimiter: Cow::from("\"to\""),
+            space: Cow::from("#h(0.167777em)"),
             exp_pos: ExpPos::Auto,
         };
         let conf_unit = UnitFmtConf {

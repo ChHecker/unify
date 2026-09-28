@@ -162,13 +162,13 @@ mod tests {
         let iter_upper = tokenizer_upper.peekable();
 
         let conf_num = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         let conf_range = RangeFmtConf {
-            delimiter: Cow::Borrowed("\"to\""),
-            space: Cow::Borrowed("#h(0.167777em)"),
+            delimiter: Cow::from("\"to\""),
+            space: Cow::from("#h(0.167777em)"),
             exp_pos: ExpPos::Auto,
         };
 
@@ -190,13 +190,13 @@ mod tests {
         let iter_upper = tokenizer_upper.peekable();
 
         let conf_num = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         let conf_range = RangeFmtConf {
-            delimiter: Cow::Borrowed("\"to\""),
-            space: Cow::Borrowed("#h(0.167777em)"),
+            delimiter: Cow::from("\"to\""),
+            space: Cow::from("#h(0.167777em)"),
             exp_pos: ExpPos::Auto,
         };
 

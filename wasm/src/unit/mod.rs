@@ -58,9 +58,9 @@ impl TryFrom<TypstUnitFmtConf> for UnitFmtConf {
 #[derive(Debug, Deserialize)]
 pub struct Units {
     pub lang: String,
-    pub prefixes: Vec<CustomPrefix>,
-    pub units: Vec<CustomUnit>,
-    pub postfixes: Vec<CustomPostfix>,
+    pub prefixes: Box<[CustomPrefix]>,
+    pub units: Box<[CustomUnit]>,
+    pub postfixes: Box<[CustomPostfix]>,
 }
 
 #[derive(Debug, Deserialize)]

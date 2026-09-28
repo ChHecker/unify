@@ -62,7 +62,7 @@ pub fn numrange(arg: &[u8]) -> crate::Result<Vec<u8>> {
 pub fn unit(arg: &[u8]) -> crate::Result<Vec<u8>> {
     let args: TypstUnit = from_reader(arg).map_err(|e| format!("error reading argument: {e}"))?;
     let mut conf: UnitFmtConf = args.config.try_into()?;
-    conf.space_first = String::from("");
+    conf.space_first = String::new();
 
     let tokenizer = LongUnitTokenizer::new(args.unit.chars());
     let iter = tokenizer.peekable();

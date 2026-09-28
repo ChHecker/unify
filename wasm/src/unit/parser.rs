@@ -1,10 +1,12 @@
+use std::borrow::Cow;
+
 use crate::num::Sign;
 use crate::unit::unit_lookup::UnitSpec;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Units<'a> {
-    pub units_num: Vec<Unit<'a>>,
-    pub units_denom: Vec<Unit<'a>>,
+    pub units_num: Box<[Unit<'a>]>,
+    pub units_denom: Box<[Unit<'a>]>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -25,7 +27,7 @@ pub struct Exponent {
 impl<'a> Units<'a> {
     pub fn validate(&self) -> crate::Result<()> {
         if self.units_num.is_empty() && self.units_denom.is_empty() {
-            return Err(String::from("empty unit"));
+            return Err(Cow::from("empty unit"));
         }
 
         Ok(())

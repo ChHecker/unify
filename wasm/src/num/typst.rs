@@ -166,9 +166,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         num.write_typst(&mut text, &config);
 
@@ -185,9 +185,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         float.write_typst(&mut text, &config);
 
@@ -204,9 +204,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         uncert.write_typst(&mut text, &config);
 
@@ -230,9 +230,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         uncert.write_typst(&mut text, &config);
 
@@ -245,9 +245,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         uncert.write_typst(&mut text, &config);
 
@@ -263,9 +263,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         exp.write_typst(&mut text, &config);
 
@@ -278,9 +278,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         super::write_int(&int, &mut text, &config);
 
@@ -293,9 +293,9 @@ mod tests {
 
         let mut text = String::new();
         let config = NumFmtConf {
-            thousand_sep: Cow::Borrowed(","),
-            dec_sep: Cow::Borrowed("."),
-            multiplier: Cow::Borrowed("dot"),
+            thousand_sep: Cow::from(","),
+            dec_sep: Cow::from("."),
+            multiplier: Cow::from("dot"),
         };
         super::write_dec(&int, &mut text, &config);
 

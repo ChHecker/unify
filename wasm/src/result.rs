@@ -1,6 +1,8 @@
 #![allow(unused)]
 
-pub type Result<T> = core::result::Result<T, String>;
+use std::borrow::Cow;
+
+pub type Result<T> = core::result::Result<T, Cow<'static, str>>;
 
 /// A utility trait in order to turn Option<Result<...>>
 /// into Result<Option<...>> and the other way around.

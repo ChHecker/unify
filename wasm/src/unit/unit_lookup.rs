@@ -120,9 +120,9 @@ mod tests {
     fn lookup() {
         let units = Units {
             lang: String::from("de"),
-            prefixes: vec![],
-            units: vec![],
-            postfixes: vec![],
+            prefixes: Box::new([]),
+            units: Box::new([]),
+            postfixes: Box::new([]),
         };
         assert!(units.contains_unit_short("g"));
     }

@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::iter::Peekable;
 
 use crate::Integer;
@@ -54,12 +55,14 @@ impl Num {
         let exp = Exponent::new(&mut iter)?;
         if let Some(next) = iter.next() {
             match next? {
-                Token::Int(_) => return Err(String::from("unexpected number after the main number")),
-                Token::Sign(_) => return Err(String::from("too many uncertainties")),
-                Token::DecSep => return Err(String::from("too many decimal separators")),
-                Token::Exp => return Err(String::from("too many exponentials")),
-                Token::PlusMinus => return Err(String::from("too many uncertainties")),
-                Token::ParenOpen | Token::ParenClose => return Err(String::from("unexpected paranthesis")),
+                Token::Int(_) => return Err(Cow::from("unexpected number after the main number")),
+                Token::Sign(_) => return Err(Cow::from("too many uncertainties")),
+                Token::DecSep => return Err(Cow::from("too many decimal separators")),
+                Token::Exp => return Err(Cow::from("too many exponentials")),
+                Token::PlusMinus => return Err(Cow::from("too many uncertainties")),
+                Token::ParenOpen | Token::ParenClose => {
+                    return Err(Cow::from("unexpected paranthesis"));
+                }
             }
         }
 
@@ -70,11 +73,11 @@ impl Num {
 
     fn validate(&self) -> crate::Result<()> {
         if self.float.is_none() && self.exp.is_none() {
-            return Err(String::from("empty number"))
+            return Err(Cow::from("empty number"));
         }
 
         if self.float.is_none() && self.uncert.is_some() {
-            return Err(String::from("cannot have uncertainty without value"));
+            return Err(Cow::from("cannot have uncertainty without value"));
         }
 
         Ok(())
@@ -85,13 +88,14 @@ impl Float {
     fn new<T: Iterator<Item = crate::Result<Token>>>(
         iter: &mut Peekable<T>,
     ) -> crate::Result<Self> {
-        let sign = match iter.peek().ok_or("invalid number")?.as_ref()? {
-            Token::Sign(sign) => {
+        let sign = match iter.peek().transpose()? {
+            Some(Token::Sign(sign)) => {
                 let sign = *sign;
                 iter.next();
                 sign
             }
-            _ => Sign::Plus,
+            Some(_) => Sign::Plus,
+            None => return Err(Cow::from("invalid number"))
         };
 
         let int = Self::parse_int(iter)?;
@@ -113,7 +117,7 @@ impl Float {
     ) -> crate::Result<String> {
         match iter.next().ok_or("invalid number")?? {
             Token::Int(int) => Ok(int),
-            t => Err(format!("unexpected token '{t}'")),
+            t => Err(format!("unexpected token '{t}'").into()),
         }
     }
 }
@@ -132,11 +136,11 @@ impl Uncertainty {
 
                 let int = match iter.next() {
                     Some(Ok(Token::Int(int))) => int,
-                    _ => return Err(String::from("expected integer in uncertainty")),
+                    _ => return Err(Cow::from("expected integer in uncertainty")),
                 };
 
                 if !matches!(iter.next(), Some(Ok(Token::ParenClose))) {
-                    return Err(String::from("expected closing parenthesis"));
+                    return Err(Cow::from("expected closing parenthesis"));
                 }
 
                 Some(Self::Shorthand(int))
@@ -148,7 +152,7 @@ impl Uncertainty {
                 match (float1.sign, float2.sign) {
                     (Sign::Plus, Sign::Minus) => (),
                     (Sign::Minus, Sign::Plus) => std::mem::swap(&mut float1, &mut float2),
-                    _ => return Err(String::from("invalid uncertainties")),
+                    _ => return Err(Cow::from("invalid uncertainties")),
                 }
 
                 Some(Self::Asymmetric {
@@ -196,7 +200,7 @@ impl Exponent {
 
                 let float = Float::new(iter)?;
                 if float.dec.is_some() {
-                    return Err(String::from("exponent may not be a decimal"));
+                    return Err(Cow::from("exponent may not be a decimal"));
                 }
 
                 Some(Self {
