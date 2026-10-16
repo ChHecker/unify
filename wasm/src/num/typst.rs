@@ -101,7 +101,9 @@ fn write_int(int: &Integer, buf: &mut String, config: &NumFmtConf) {
 
     buf.push_str(&int[0..rem]);
     for i in 0..len {
-        buf.push_str(&config.thousand_sep);
+        if i != 0 || rem != 0 {
+            buf.push_str(&config.thousand_sep);
+        }
         let range = rem + 3 * i..rem + 3 * (i + 1);
         buf.push_str(&int[range]);
     }
