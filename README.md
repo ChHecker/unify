@@ -27,7 +27,7 @@ The Unify package supports multiple languages. Currently, the supported language
     - asymmetric uncertainties with `+{}-{}`
 - exponential notation `e{}`
 
-Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential.
+Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential. (Note that `thousandsep` only has an effect if the number has five digits or more).
 
 *Note: Because units are evaluated in math mode, plain spaces (`thousandsep: " "`) will not have the desired effect. Use `thousandsep: "space"` instead.*
 
