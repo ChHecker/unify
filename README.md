@@ -8,16 +8,27 @@
 #import "@preview/unify:0.8.1": num,qty,numrange,qtyrange
 
 $ num("-1.32865+-0.50273e-6") $
-$ qty("1.3+1.2-0.3e3", "erg/cm^2/s", space: "#h(2mm)") $
+$ qty("1.3+1.2-0.3e3", "erg/cm^(3/2)/s", space: "dot", num-unit-space: "#h(2mm)") $
 $ numrange("1,1238e-2", "3,0868e5", thousandsep: "'") $
-$ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"") $
+$ qtyrange("1e3", "2e3", "meter per second squared", per: "/", delimiter: "\"to\"", range-unit-space: "#h(3mm)") $
+$ qty("55.36", "usd") $
 ```
 <img src="examples/overview.jpg" width="300" alt="Example of unify rendering scientific notation with uncertainties and units using custom spacing, thousands separators, and delimiters.">
 
 Right now, physical, monetary, and binary units are supported. New issues or pull requests for new units are welcome!
 
-## Multilingual support 
-The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`, and in the `lib.typ` file you should fix the `lang-db` state for your files.
+### Math and text mode
+By default, all output is rendered as math and therefore uses the math font. If you prefer numbers and units to match the surrounding document font (like `mode = text` in `siunitx`), set `mode: "text"`:
+```typ
+The speed of light is #qty("2.99792458e8", "m/s", mode: "text").
+```
+In text mode, the glyphs are rendered in the current document font and weight (so it also works in bold headings), while the math font is still used for layout so that exponents, fractions, and parentheses are positioned correctly. The parameter is available on `num`, `unit`, `qty`, `numrange`, and `qtyrange`. To enable it globally, you can use:
+```typ
+#update-global-config("mode", "text")
+```
+
+### Multilingual support 
+The Unify package supports multiple languages. Currently, the supported languages are English and Russian. The fallback is English. If you want to add your language, you should add two files: `prefixes-xx.csv` and `units-xx.csv`. The Rust crate in `wasm` then automatically compiles them into the binary.
 
 ## `num`
 `num` uses string parsing in order to typeset numbers, including separators between the thousands. They can have the following form:
@@ -25,6 +36,7 @@ The Unify package supports multiple languages. Currently, the supported language
 - either (`{}` stands for a number)
     - symmetric uncertainties with `+-{}` or `±{}`
     - asymmetric uncertainties with `+{}-{}`
+    - shorthand uncertainties with `({})`
 - exponential notation `e{}`
 
 Parentheses are automatically set as necessary. Use `thousandsep` to change the separator between the thousands, and `multiplier` to change the multiplication symbol between the number and exponential.
@@ -48,7 +60,8 @@ The shorthand notation also has four parts:
 
 Note: Use `u` for micro.
 
-The possible values of the three latter parts are loaded at runtime from `prefixes.csv`, `units.csv`, and `postfixes.csv` (in the library directory). Your own units etc. can be permanently added in these files. At runtime, they can be added using `add-unit` and `add-prefix`, respectively. The formats for the pre- and postfixes are:
+### Adding units
+The formats for pre- and postfixes are:
 
 | pre-/postfix | shorthand | symbol       |
 | ------------ | --------- | ------------ |
@@ -60,8 +73,13 @@ and for units:
 | ----- | --------- | ------------ | ----- |
 | meter | m         | upright("m") | true  |
 
-The first column specifies the written-out word, the second one the shorthand. These should be unique. The third column represents the string that will be inserted as the unit symbol. For units, the last column describes whether there should be space before the unit (possible values: `true`/`false`, `1`,`0`). This is mostly the cases for degrees and other angle units (e.g. arcseconds).  
-If you think there are units not included that are of interest for other users, you can create an issue or PR.
+The first column specifies the written-out word, the second one the shorthand. These should be unique. The third column represents the string that will be inserted as the unit symbol. For units, the last column describes whether there should be space before the unit (possible values: `true`/`false`, `1`,`0`). This is mostly the cases for degrees and other angle units (e.g. arcseconds).
+
+#### Compile time
+The included units, prefixes, and postfixes are compiled into the WASM binary at compile time from `units/prefixes_xx.csv`, `units/units_xx.csv`, and `units/postfixes_xx.csv` (in the library directory, where `xx` is the language). You can add you own units etc. by appending them to these files, and recompiling the Rust crate using `build_wasm.sh`. If you think there are units not included that are of interest for other users, you can create an issue or PR.
+
+#### Runtime
+At runtime, units can be added using `add-unit`, `add-prefix`, and `add-postfix`, respectively.   
 
 
 ## `qty`
@@ -69,8 +87,13 @@ If you think there are units not included that are of interest for other users, 
 
 
 ## `numrange`
-`numrange` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`.
+`numrange` takes two `num`s as the first two arguments. If they have the same exponent, it is automatically factorized. The range symbol can be changed with `delimiter`, and the space between the numbers and symbols with `space`. `exppos` can be used to specify how to format the exponential, with `"auto"` factoring out common exponentials and `"both"` keeping them seperate.
 
 
 ## `qtyrange`
-`qtyrange` is just a combination of `unit` and `range`. `space` is inserted between the numbers and the delimiter (equivalently to `numrange`), `unitspace` between the units (equivalently to `space` in `unit` and `qty`), and range-unit-space between the range/exponential and the units.
+`qtyrange` is just a combination of `unit` and `numrange`. `space` is inserted between the numbers and the delimiter (equivalently to `numrange`), `unitspace` between the units (equivalently to `space` in `unit` and `qty`), and `range-unit-space` between the range/exponential and the units. This also supports `exppos`. The units' positions can be specified using `unitpos`, which has three options:
+- `"factor"`: Factorizes the unit using parentheses, e.g. (2 to 4) m.
+- `"single"`: Factorizes the unit without parentheses, e.g. 2 to 4 m.
+- `"both"`: Places the unit after both numbers, e.g. 2 m to 4 m.
+
+The latter two may not be combined with `exppos` set to `auto`.

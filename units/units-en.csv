@@ -3,7 +3,7 @@ metre,m,upright("m"),true
 lightyear,ly,upright("ly"),true
 parsec,pc,upright("pc"),true
 astronomicalunit,au,upright("au"),true
-angstrom,A,upright("Å"),true
+angstrom,Ang,upright("Å"),true
 hectare,ha,upright("ha"),true
 barn,b,upright("b"),true
 litre,l,upright("l"),true
@@ -62,5 +62,5 @@ neper,Np,upright("Np"),true
 coulomb,C,upright("C"),true
 katal,kat,upright("kat"),true
 byte,B,upright("B"),true
-bit,b,upright("b"),true
+bit,bit,upright("bit"),true
 baud,Bd,upright("Bd"),true

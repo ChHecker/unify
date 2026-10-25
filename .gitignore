@@ -1,2 +1,6 @@
 .vscode
 .DS_Store
+wasm/target
+lib.pdf
+utils.pdf
+init.pdf
